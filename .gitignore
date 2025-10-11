@@ -1,0 +1,16 @@
+# OSX
+#
+.DS_Store
+.idea
+
+# node.js
+#
+node_modules/
+node_modules
+npm-debug.log
+yarn-error.log
+build/
+bin/
+.dockerignore
+# Bundle artifact
+*.jsbundle
