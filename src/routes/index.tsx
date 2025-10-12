@@ -22,6 +22,15 @@ const BattalionList = React.lazy(
   () => import("../pages/configs/battalion/BattalionList")
 );
 
+//Company
+const CompanyList = React.lazy(
+  () => import("../pages/configs/company/CompanyList")
+);
+// Platoon
+const PlatoonList = React.lazy(
+  () => import("../pages/configs/platoon/PlatoonList")
+);
+
 interface PrivateRouteProps extends RouteProps {
   component: any;
   roles: any;
@@ -146,6 +155,18 @@ const BattalionRouter = [
     name: "Quản lý tiểu đoàn",
     path: "/battalion/list",
     component: BattalionList,
+    route: PrivateRoute,
+  },
+  {
+    name: "Quản lý đại đội",
+    path: "/company/list",
+    component: CompanyList,
+    route: PrivateRoute,
+  },
+  {
+    name: "Quản lý trung đội",
+    path: "/platoon/list",
+    component: PlatoonList,
     route: PrivateRoute,
   },
 ];

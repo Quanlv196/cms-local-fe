@@ -1,139 +1,121 @@
-import {
-  Avatar,
-  Checkbox,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  Row,
-  Select,
-} from "antd";
-import React, { useEffect, useRef, useState } from "react";
-import moment from "moment";
+import { Checkbox, Form, Input } from "antd";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { isEmpty, startsWith } from "lodash";
-import noImage from "../../assets/images/users/no-img.jpg";
-import { FileUploader } from "react-drag-drop-files";
 import { Button } from "reactstrap";
-import { useHistory } from "react-router";
-import { useUser } from "../../hooks/useUser";
-import TextUtils from "../../helpers/TextUtils";
 import { baseUrl } from "../../constants/environment";
-import { getBase64, uploadFile } from "../../helpers/UploadUtils";
 import APIClient from "../../helpers/APIClient";
 import UserManager from "../../manager/UserManager";
 import Loader from "../../components/Loader";
-import {
-  ContractList,
-  PositionList,
-  SexList,
-} from "../../constants/bilet-constant";
+import { useForm } from "antd/lib/form/Form";
+import { Platoon } from "../configs/platoon/PlatoonList";
+import { Company } from "../configs/company/CompanyList";
+import { Battalion } from "../configs/battalion/BattalionList";
 import { DebounceSelect } from "../../common/DebounceSelect";
+import { IBaseOptions } from "../../interfaces/common.interface";
+
+interface IUser extends IBaseOptions {
+  id?: number;
+  name?: string;
+  username?: string;
+  password?: string;
+  status?: number;
+  company_id?: Company | null;
+  platoon_id?: Platoon | null;
+  battalion_id?: Battalion | null;
+}
 
 const List = (props: any) => {
-  const {
-    onlyView,
-    onDelete,
-    closeModal,
-    id,
-    loadData,
-    place,
-    dataDetail,
-    onRemoveUser,
-    onResetPassword,
-  } = props;
-  const user = useUser();
+  const { closeModal, loadData, dataProps } = props;
   const [loading, setLoading] = useState<any>(false);
-  const [data, setData] = useState<any>({});
-  const formRef = useRef<any>(null);
-  const [roles, setRoles] = useState<any>([]);
-  const [imgAvatar, setimgAvatar] = useState<any>(null);
-  const router = useHistory();
+  const [data, setData] = useState<IUser>({ status: 1 });
+  const [form] = useForm();
+  const [platoon, setPlatoon] = useState<Platoon[]>([]);
+  const [company, setCompany] = useState<Company[]>([]);
+  const [battalion, setBattalion] = useState<Battalion[]>([]);
 
   useEffect(() => {
-    fetchRoles();
+    fetchPlatoon();
+    fetchCompany();
+    fetchBattalion();
   }, []);
 
-  useEffect(() => {
-    setData(dataDetail);
-  }, [dataDetail]);
+  const fetchPlatoon = async (name?: string, company_id?: number) => {
+    const URL = `${baseUrl}/platoon`;
+    const response: any = await APIClient.GET(URL, { name, company_id });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setPlatoon(response.response?.data);
+    }
+  };
 
-  console.log("data", data);
+  const fetchCompany = async (name?: string, battalion_id?: number) => {
+    const URL = `${baseUrl}/company`;
+    const response: any = await APIClient.GET(URL, { name, battalion_id });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setCompany(response.response?.data);
+    }
+  };
+
+  const fetchBattalion = async (name?: string) => {
+    const URL = `${baseUrl}/battalion`;
+    const response: any = await APIClient.GET(URL, { name });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setBattalion(response.response?.data);
+    }
+  };
+
+  useEffect(() => {
+    if (dataProps?.data?.id) {
+      fetchDataDetail();
+    }
+  }, [dataProps]);
+
+  const fetchDataDetail = async () => {
+    const URL = `${baseUrl}/user/${dataProps?.data?.id}`;
+    setLoading(true);
+    const response: any = await APIClient.GET(URL);
+    setLoading(false);
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      const res = response.response;
+      setData({
+        ...res,
+        platoon_id: res?.platoon,
+        company_id: res?.company,
+        battalion_id: res?.battalion,
+      });
+    }
+  };
 
   const handleChangeInput = (event?: any) => {
     let { value, name } = event.target;
-    if (value === " ") return;
-    if (name == "phone") {
-      value = TextUtils.onlyNumber(value);
+    if (name === "username") {
+      value = value.replace(/\s+/g, "");
     }
+    if (value === " ") return;
     setData({
       ...data,
       [name]: value,
     });
   };
 
-  const fetchRoles = async (name?: string) => {
-    const params: any = {
-      name: name ? name : "",
-      status: 1,
-    };
-    if (params?.name === "") delete params?.name;
-    const URL = `${baseUrl}/roles`;
-    setLoading(true);
-    let response: any = await APIClient.GET(URL, params);
-    setLoading(false);
-    if (response.error !== undefined) {
-      toast.error(response.error.error_description);
-    } else if (response.response !== undefined) {
-      let List = response.response.data?.map((item: any) => ({
-        ...item,
-        name: item?.name,
-        label: item?.name,
-        value: item?.id,
-      }));
-      setRoles(List);
-      return List;
-    } else {
-      return [];
-    }
-  };
-
-  const validation = () => {
-    if (!isEmpty(data?.email) && !TextUtils.validateEmail(data?.email)) {
-      toast.error("Email không đúng định dạng");
-      return false;
-    }
-    if (!isEmpty(data?.phone) && !TextUtils.validatePhone(data?.phone)) {
-      toast.error("Số điện thoại không đúng định dạng");
-      return false;
-    }
-    return true;
-  };
-
-  console.log("dataxxx", data);
-
   const handleEdit = async () => {
-    await formRef?.current?.validateFields();
-    if (!validation()) return;
+    await form?.validateFields();
     const URL = `${baseUrl}/user/${data?.id}`;
     const params: any = {
-      ...data,
-      roles: data?.roles?.map((e: any) => e?.value),
-      birthday: data?.birthday ? moment(data?.birthday).utc() : undefined,
+      name: data?.name,
+      username: data?.username,
+      password: data?.password,
+      platoon_id: data?.platoon_id?.value ?? null,
+      company_id: data?.company_id?.value ?? null,
+      battalion_id: data?.battalion_id?.value ?? null,
     };
-    if (!!imgAvatar) {
-      const url_avatar: any = await uploadFile(imgAvatar);
-      if (url_avatar && startsWith(url_avatar, "http")) {
-        params.avatar = url_avatar;
-      } else {
-        toast.error("Không thể tải ảnh lên ảnh đại diện");
-        return false;
-      }
-    }
-    delete params?.created_time;
-    delete params?.created_uid;
-    delete params?.updated_time;
-    delete params?.permissions;
 
     setLoading(true);
     let response: any = await APIClient.PUT(URL, params);
@@ -142,22 +124,20 @@ const List = (props: any) => {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
       UserManager._getUserInfo();
-      toast.success("Chỉnh sửa nhân viên thành công!");
-      if (place === "detail") {
-        router?.push(`/user/${data?.id}/view`);
-      }
-      closeModal && closeModal();
-      loadData && loadData();
+      toast.success("Chỉnh sửa tài khoản thành công!");
+      closeModal?.();
+      loadData?.();
     }
   };
 
   const handleSubmit = async () => {
-    await formRef?.current?.validateFields();
-    if (!validation()) return;
+    await form?.validateFields();
     const URL = `${baseUrl}/user`;
     const params: any = {
       ...data,
-      roles: data?.roles?.map((e: any) => e?.value),
+      platoon_id: data?.platoon_id?.value ?? null,
+      company_id: data?.company_id?.value ?? null,
+      battalion_id: data?.battalion_id?.value ?? null,
     };
     setLoading(true);
     let response: any = await APIClient.POST(URL, params);
@@ -165,328 +145,139 @@ const List = (props: any) => {
     if (response.error !== undefined) {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
-      toast.success("Thêm mới nhân viên thành công!");
-      closeModal && closeModal();
-      loadData && loadData();
+      toast.success("Thêm mới tài khoản thành công!");
+      closeModal?.();
+      loadData?.();
     }
-  };
-
-  const _onChangeDate = (date: any) => {
-    if (!!!date) return;
-    setData({
-      ...data,
-      birthday: moment(date, "x")?.valueOf(),
-    });
-  };
-
-  const handleChangeFile = async (file: any) => {
-    setLoading(true);
-    const imgBase64: any = await getBase64(file);
-    setLoading(false);
-    if (imgBase64) {
-      setData({
-        ...data,
-        avatar: imgBase64,
-      });
-    }
-    setimgAvatar(file);
   };
 
   return (
     <Form
-      ref={formRef}
+      form={form}
       wrapperCol={{ flex: 1 }}
       layout="vertical"
       autoComplete="off"
       className="form_normal"
       fields={[
-        { name: "name", value: data?.name },
         { name: "password", value: data?.password },
-        { name: "email", value: data?.email },
+        { name: "username", value: data?.username },
       ]}
     >
-      <div className={place ? "p-3" : "form__box p-3"}>
-        <Row gutter={[place ? 50 : 20, 0]}>
-          {place && (
-            <Col md={24} xs={24}>
-              <Form.Item label="" style={{ display: "inline-flex" }}>
-                <FileUploader
-                  handleChange={(e: any) => {
-                    handleChangeFile(e);
-                    setimgAvatar(null);
-                  }}
-                  fileOrFiles={imgAvatar}
-                  multiple={false}
-                  name="file"
-                  types={["JPEG", "JPG", "PNG"]}
-                  classes="file-drop-inner upload__file"
-                  disabled={onlyView}
-                >
-                  <Avatar
-                    src={data?.avatar || noImage}
-                    alt="avatar"
-                    style={{ width: 70, height: 70 }}
-                  />
-                  <div className="icon_upload">
-                    <i className="uil-camera-change"></i>
-                  </div>
-                </FileUploader>
-              </Form.Item>
-            </Col>
-          )}
-
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item
-              label="Tên nhân viên"
-              name={"name"}
-              rules={[{ required: true, message: "Tên nhân viên là bắt buộc" }]}
-            >
-              <Input
-                disabled={onlyView}
-                onChange={(e: any) => handleChangeInput(e)}
-                allowClear
-                value={data?.name}
-                name="name"
-                placeholder="Nhập họ tên nhân viên"
-              />
-            </Form.Item>
-          </Col>
-          {place && (
-            <Col md={place ? 12 : 24} xs={24}>
-              <Form.Item label="Mã nhân viên">
-                <div
-                  className="d-flex align-items-center"
-                  style={{ minHeight: 44, fontSize: 16 }}
-                >
-                  {data?.code || "---"}
-                </div>
-              </Form.Item>
-            </Col>
-          )}
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item label="Ngày sinh">
-              <DatePicker
-                disabled={onlyView}
-                onChange={_onChangeDate}
-                name="birthday"
-                placeholder="Chọn ngày sinh"
-                format={"DD/MM/YYYY"}
-                value={data?.birthday && moment(data?.birthday)}
-                allowClear
-                suffixIcon={<i className="uil-calendar-alt"></i>}
-              />
-            </Form.Item>
-          </Col>
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item label="Giới tính">
-              <Select
-                placeholder="Chọn giới tính"
-                onChange={(vl: string) => setData({ ...data, sex: vl })}
-                disabled={onlyView}
-                value={data?.sex}
-                style={{ flex: 1, fontSize: 16 }}
-                dropdownStyle={{ minWidth: 200 }}
-                allowClear
-              >
-                {SexList?.map((item: any, index: number) => (
-                  <Select.Option key={`sexx_${index}`} value={item.value}>
-                    {item.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          {!place && (
-            <Col md={place ? 12 : 24} xs={24}>
-              <Form.Item
-                label="Mật khẩu"
-                name={"password"}
-                rules={[{ required: true, message: "Mật khẩu là bắt buộc" }]}
-              >
-                <Input
-                  disabled={onlyView}
-                  onChange={(e: any) => handleChangeInput(e)}
-                  type="password"
-                  allowClear
-                  value={data?.password}
-                  name="password"
-                  placeholder="Nhập mật khẩu"
-                />
-              </Form.Item>
-            </Col>
-          )}
-
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item
-              label="Email"
-              name={"email"}
-              rules={[{ required: true, message: "Email là bắt buộc" }]}
-            >
-              <Input
-                disabled={onlyView}
-                onChange={(e: any) => handleChangeInput(e)}
-                allowClear
-                name="email"
-                value={data?.email}
-                placeholder="Nhập Email"
-              />
-            </Form.Item>
-          </Col>
-          {place && (
-            <Col md={12} xs={24}>
-              <Form.Item label="Số điện thoại">
-                <Input
-                  disabled={onlyView}
-                  onChange={(e: any) => handleChangeInput(e)}
-                  type="text"
-                  allowClear
-                  name="phone"
-                  value={data?.phone}
-                  placeholder="Nhập số điện thoại"
-                />
-              </Form.Item>
-            </Col>
-          )}
-
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item label="Chức vụ">
-              <Select
-                placeholder="Chọn chức vụ"
-                onChange={(vl: string) => setData({ ...data, position: vl })}
-                disabled={onlyView}
-                value={data?.position}
-                style={{ flex: 1, fontSize: 16 }}
-                dropdownStyle={{ minWidth: 200 }}
-                allowClear
-              >
-                {PositionList?.map((item: any, index: number) => (
-                  <Select.Option key={`position${index}`} value={item.value}>
-                    {item.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item label="Hợp đồng">
-              <Select
-                placeholder="Chọn hợp đồng"
-                onChange={(vl: string) => setData({ ...data, contract: vl })}
-                disabled={onlyView}
-                value={data?.contract}
-                style={{ flex: 1, fontSize: 16 }}
-                dropdownStyle={{ minWidth: 200 }}
-                allowClear
-              >
-                {ContractList?.map((item: any, index: number) => (
-                  <Select.Option
-                    key={`contract_${index}`}
-                    value={item.value}
-                    id={item.value}
-                  >
-                    {item.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col md={place ? 12 : 24} xs={24}>
-            <Form.Item label="Phân quyền">
-              <DebounceSelect
-                labelInValue={true}
-                mode="multiple"
-                value={data?.roles}
-                placeholder="Tìm kiếm phân quyền"
-                fetchOptions={fetchRoles}
-                onChange={(dt: any) => setData({ ...data, roles: dt })}
-                style={{ width: "100%" }}
-                optionDefault={roles}
-                onlyView={place == "sale_member" ? false : onlyView}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        {place && (
-          <div className="mt-3 d-flex align-items-center justify-content-between">
-            <Checkbox
-              checked={data?.status == 1 ? true : false}
-              disabled={onlyView}
-              onChange={(event: any) =>
-                setData({ ...data, status: event?.target?.checked ? 1 : 0 })
-              }
-            >
-              Hoạt động
-            </Checkbox>
-          </div>
-        )}
-      </div>
-      {place !== "sale_member" && (
-        <div className={place ? "bottom-action" : "p-3"}>
-          <div className="group_button d-flex justify-content-center">
-            {onlyView ? (
-              <>
-                <Button
-                  onClick={() => onResetPassword(data)}
-                  className="ml-2 bilet_button outline danger"
-                  type="button"
-                >
-                  Reset mật khẩu
-                </Button>
-                <Button
-                  onClick={() => onDelete(data)}
-                  className="ml-2 bilet_button outline danger"
-                  type="button"
-                >
-                  Xóa tài khoản
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={closeModal}
-                className="ml-2 bilet_button outline"
-                type="button"
-              >
-                Hủy
-              </Button>
-            )}
-            {!!!id ? (
-              <Button
-                onClick={handleSubmit}
-                className="ml-2 bilet_button"
-                type="button"
-              >
-                Thêm mới
-              </Button>
-            ) : onlyView ? (
-              <Button
-                onClick={() => router?.push(`/user/${id}`)}
-                className="ml-2 bilet_button"
-                type="button"
-              >
-                Chỉnh sửa thông tin
-              </Button>
-            ) : (
-              <Button
-                onClick={handleEdit}
-                className="ml-2 bilet_button"
-                type="button"
-              >
-                Lưu lại
-              </Button>
-            )}
-          </div>
+      <div className={"form__box p-3"}>
+        <Form.Item
+          label="Tên đăng nhập"
+          name={"username"}
+          rules={[{ required: true, message: "Tên đăng nhập là bắt buộc" }]}
+        >
+          <Input
+            onChange={(e: any) => handleChangeInput(e)}
+            allowClear
+            value={data?.username}
+            name="username"
+            placeholder="Nhập tên đăng nhập"
+          />
+        </Form.Item>
+        <Form.Item
+          label="Mật khẩu"
+          name={"password"}
+          rules={[
+            {
+              required: dataProps?.type !== "edit",
+              message: "Mật khẩu là bắt buộc",
+            },
+          ]}
+        >
+          <Input
+            onChange={(e: any) => handleChangeInput(e)}
+            type="password"
+            allowClear
+            value={data?.password}
+            name="password"
+            placeholder="Nhập mật khẩu"
+          />
+        </Form.Item>
+        <Form.Item label="Tên người dùng">
+          <Input
+            onChange={(e: any) => handleChangeInput(e)}
+            allowClear
+            value={data?.name}
+            name="name"
+            placeholder="Nhập tên người dùng"
+          />
+        </Form.Item>
+        <div className="note mb-2 text-danger">
+          <i>Lưu ý: Dữ liệu bên dưới phục vụ phân quyền xem dữ liệu.</i>
         </div>
-      )}
-      {place === "sale_member" && (
-        <div className={place ? "bottom-action" : "p-3"}>
-          <div className="group_button d-flex justify-content-center">
+        <Form.Item label="Tiểu đoàn">
+          <DebounceSelect
+            value={data?.battalion_id}
+            placeholder="Tìm kiếm"
+            fetchOptions={fetchBattalion}
+            onChange={(dt: any) => {
+              setData({
+                ...data,
+                battalion_id: dt,
+                company_id: null,
+                platoon_id: null,
+              });
+              fetchCompany("", dt?.value);
+            }}
+            style={{ width: "100%" }}
+            optionDefault={battalion}
+          />
+        </Form.Item>
+        <Form.Item label="Đại đội">
+          <DebounceSelect
+            value={data?.company_id}
+            placeholder="Tìm kiếm"
+            fetchOptions={fetchCompany}
+            onChange={(dt: any) => {
+              setData({ ...data, company_id: dt, platoon_id: null });
+              fetchPlatoon("", dt?.value);
+            }}
+            style={{ width: "100%" }}
+            optionDefault={company}
+          />
+        </Form.Item>
+        <Form.Item label="Trung đội">
+          <DebounceSelect
+            value={data?.platoon_id}
+            placeholder="Tìm kiếm"
+            fetchOptions={fetchPlatoon}
+            onChange={(dt: any) => setData({ ...data, platoon_id: dt })}
+            style={{ width: "100%" }}
+            optionDefault={platoon}
+          />
+        </Form.Item>
+        <div className="mt-3 d-flex align-items-center justify-content-between">
+          <Checkbox
+            checked={data?.status == 1 ? true : false}
+            onChange={(event: any) =>
+              setData({ ...data, status: event?.target?.checked ? 1 : 0 })
+            }
+          >
+            Hoạt động
+          </Checkbox>
+        </div>
+      </div>
+      <div className={"p-3"}>
+        <div className="group_button d-flex justify-content-center">
+          <Button
+            onClick={closeModal}
+            className="ml-2 bilet_button outline"
+            type="button"
+          >
+            Hủy
+          </Button>
+          {!!!dataProps?.data?.id ? (
             <Button
-              onClick={() => onRemoveUser()}
-              className="ml-2 bilet_button outline danger"
+              onClick={handleSubmit}
+              className="ml-2 bilet_button"
               type="button"
             >
-              Xóa khỏi nhóm
+              Thêm mới
             </Button>
+          ) : (
             <Button
               onClick={handleEdit}
               className="ml-2 bilet_button"
@@ -494,9 +285,9 @@ const List = (props: any) => {
             >
               Lưu lại
             </Button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
       {loading && <Loader />}
     </Form>
   );

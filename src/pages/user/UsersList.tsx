@@ -2,11 +2,10 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button, CardBody, Col, Row, Table } from "reactstrap";
-import { Avatar, Checkbox, Input } from "antd";
+import { Avatar, Input } from "antd";
 import { useHistory } from "react-router";
-import noImage from "../../assets/images/users/no-img.jpg";
 import queryString from "query-string";
-import { cloneDeep, isEmpty, isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { baseUrl } from "../../constants/environment";
 import APIClient from "../../helpers/APIClient";
 import PageTitle from "../../components/PageTitle";
@@ -16,7 +15,6 @@ import ModalPopup from "../../components/ModalPopup";
 import Loader from "../../components/Loader";
 import RowEmpty from "../../components/RowEmpty";
 import UsersAdd from "./UsersAdd";
-import { ContractList, PositionList } from "../../constants/bilet-constant";
 interface Props {
   history: any;
   location: any;
@@ -28,7 +26,7 @@ const initialParams = {
 };
 
 const configPage = {
-  titlePage: "Danh sách nhân viên",
+  titlePage: "Danh sách tài khoản",
   pathPage: "/users/list",
   column: 9,
 };
@@ -166,8 +164,8 @@ const List: React.FC<Props> = (props: any) => {
   return (
     <React.Fragment>
       <PageTitle
-        title="Quản lý nhân viên"
-        breadCrumbItems={[{ label: "Quản lý nhân viên", active: true }]}
+        title="Quản lý tài khoản"
+        breadCrumbItems={[{ label: "Quản lý tài khoản", active: true }]}
         rightContent={
           <div className="group__button  ">
             <Button
@@ -175,7 +173,7 @@ const List: React.FC<Props> = (props: any) => {
               onClick={() => handleActionModal({ type: "add" })}
               className="bilet_button"
             >
-              <i className="uil-plus"></i> Thêm nhân viên
+              <i className="uil-plus"></i> Thêm tài khoản
             </Button>
           </div>
         }
@@ -273,7 +271,7 @@ const DataFilter = (props: any) => {
                 onKeyPress={_onKeyPress}
                 onChange={(e: any) => setCode(e.target.value)}
                 value={code}
-                placeholder="Tìm kiếm nhân viên"
+                placeholder="Tìm kiếm tài khoản"
               />
             </Col>
             <Col md={2}>
@@ -294,21 +292,9 @@ const DataFilter = (props: any) => {
 };
 
 const DataTableList = (props: any) => {
-  const {
-    data,
-    loading,
-    limit,
-    page,
-    handleActionModal,
-    dataChecked,
-    setDataChecked,
-  } = props;
+  const { data, loading, limit, page, handleActionModal, dataChecked } = props;
   const start = limit * (page - 1);
   const router = useHistory();
-
-  const gotoDetail = (item: any) => {
-    router?.push(`/user/${item?.id}/view`);
-  };
 
   const getLabelStatus = (status: any) => {
     switch (status) {
@@ -327,34 +313,17 @@ const DataTableList = (props: any) => {
       }
     }
   };
-  const handleCheckAll = (event: any) => {
-    const { checked } = event?.target;
-    if (checked) {
-      setDataChecked(data?.map((e: any) => e?.id));
-    } else {
-      setDataChecked([]);
-    }
-  };
 
   const RenderHeadData = () => {
     return (
       <thead>
         <tr>
-          <th style={{ minWidth: 20 }}>
-            <Checkbox
-              checked={
-                dataChecked?.length === data?.length && dataChecked?.length > 0
-              }
-              onChange={handleCheckAll}
-            />
-          </th>
           <th style={{ minWidth: 50 }}>Stt</th>
-          <th style={{ minWidth: 90 }}>Ảnh</th>
-          <th style={{ minWidth: 100 }}>Mã nhân viên</th>
-          <th style={{ minWidth: 120 }}>Tên nhân viên</th>
-          <th style={{ minWidth: 100 }}>Số điện thoại</th>
-          <th style={{ minWidth: 100 }}>Chức vụ</th>
-          <th style={{ minWidth: 100 }}>Hợp đồng</th>
+          <th style={{ minWidth: 120 }}>Tên tài khoản</th>
+          <th style={{ minWidth: 120 }}>Tên người dùng</th>
+          <th style={{ minWidth: 100 }}>Tiểu đoàn</th>
+          <th style={{ minWidth: 100 }}>Đại đội</th>
+          <th style={{ minWidth: 100 }}>Trung đội</th>
           <th style={{ minWidth: 100 }}>Trạng thái</th>
           <th style={{ width: 60 }}></th>
         </tr>
@@ -363,22 +332,6 @@ const DataTableList = (props: any) => {
   };
 
   const RenderBobyData = () => {
-    const handleCheck = (id: any, e: any) => {
-      const idsTMP = cloneDeep(dataChecked);
-      const { checked } = e?.target;
-      if (checked) {
-        if (!dataChecked?.includes(id)) {
-          idsTMP.push(id);
-          setDataChecked(idsTMP);
-        }
-      } else {
-        var index = dataChecked.indexOf(id);
-        if (index !== -1) {
-          idsTMP.splice(index, 1);
-          setDataChecked(idsTMP);
-        }
-      }
-    };
     if (data.length === 0) {
       return (
         <RowEmpty
@@ -387,44 +340,18 @@ const DataTableList = (props: any) => {
         />
       );
     }
-    const getLabelFromValue = (list: any, value: any) => {
-      const check = list?.find((e: any) => e?.value === value);
-      if (check) {
-        return check?.label;
-      }
-      return "---";
-    };
     return (
       <tbody>
         {data &&
           data.map((item: any, index: number) => (
             <tr>
-              <td>
-                <Checkbox
-                  checked={dataChecked?.includes(item?.id)}
-                  onChange={(e: any) => handleCheck(item?.id, e)}
-                />
-              </td>
               <td>{start + index + 1}</td>
-              <td onClick={() => gotoDetail(item)}>
-                {item?.avatar ? (
-                  <Avatar src={item?.avatar} />
-                ) : (
-                  <Avatar src={noImage} />
-                )}
-              </td>
-              <td onClick={() => gotoDetail(item)}>{item?.code || "---"}</td>
-              <td onClick={() => gotoDetail(item)}>{item?.name || "---"}</td>
-              <td onClick={() => gotoDetail(item)}>{item?.email || "---"}</td>
-              <td onClick={() => gotoDetail(item)}>
-                {getLabelFromValue(PositionList, item?.position)}
-              </td>
-              <td onClick={() => gotoDetail(item)}>
-                {getLabelFromValue(ContractList, item?.contract)}
-              </td>
-              <td onClick={() => gotoDetail(item)}>
-                {getLabelStatus(item?.status)}
-              </td>
+              <td>{item?.username || "---"}</td>
+              <td>{item?.name || "---"}</td>
+              <td>{item?.battalion?.name || "---"}</td>
+              <td>{item?.company?.name || "---"}</td>
+              <td>{item?.platoon?.name || "---"}</td>
+              <td>{getLabelStatus(item?.status)}</td>
               <td>
                 <div className="list__action_table">
                   <div
@@ -436,7 +363,9 @@ const DataTableList = (props: any) => {
                     <i className="uil-trash-alt"></i>
                   </div>
                   <div
-                    onClick={() => router?.push(`/user/${item?.id}`)}
+                    onClick={() =>
+                      handleActionModal({ type: "edit", data: item })
+                    }
                     className="item bg_primary"
                   >
                     <i className="uil-pen"></i>
@@ -452,7 +381,7 @@ const DataTableList = (props: any) => {
     <>
       {dataChecked?.length > 0 && (
         <div className="selected_box mb-3">
-          <span className="mr-2">{`${dataChecked?.length} nhân viên được chọn`}</span>
+          <span className="mr-2">{`${dataChecked?.length} tài khoản được chọn`}</span>
           <div className="d-flex align-items-center">
             <div
               className="button_checked danger"
@@ -485,8 +414,7 @@ const DataTableList = (props: any) => {
 
 const RenderActionModal = (props: any) => {
   const [loading, setLoading] = useState(false);
-  const { closeModal, loadData, action, setDataChecked } = props;
-  const [type, setType] = useState(action?.type);
+  const { closeModal, loadData, action } = props;
 
   const handleDelete = async () => {
     const URL = `${baseUrl}/user/${action?.data?.id}`;
@@ -496,74 +424,13 @@ const RenderActionModal = (props: any) => {
     if (response.error !== undefined) {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
-      closeModal();
-      loadData();
-      toast.success("Xóa nhân viên thành công!");
+      closeModal?.();
+      loadData?.();
+      toast.success("Xóa tài khoản thành công!");
     }
   };
 
-  const handleDeleteAll = async () => {
-    const URL = `${baseUrl}/user`;
-    const params = {
-      ids: action?.data,
-    };
-    setLoading(true);
-    let response: any = await APIClient.DELETE(URL, params);
-    setLoading(false);
-    if (response.error !== undefined) {
-      toast.error(response.error.error_description);
-    } else if (response.response !== undefined) {
-      closeModal();
-      setDataChecked([]);
-      loadData();
-      toast.success(`Xóa ${action?.data?.length} nhân viên thành công`);
-    }
-  };
-
-  const handleStopAll = async () => {
-    const URL = `${baseUrl}/user/status`;
-    const params = {
-      ids: action?.data,
-      status: 0,
-    };
-    setLoading(true);
-    let response: any = await APIClient.PUT(URL, params);
-    setLoading(false);
-    if (response.error !== undefined) {
-      toast.error(response.error.error_description);
-    } else if (response.response !== undefined) {
-      closeModal();
-      loadData();
-      setDataChecked([]);
-      toast.success(
-        `Ngưng hoạt động ${action?.data?.length} nhân viên thành công`
-      );
-    }
-  };
-
-  if (action?.type == "add") {
-    return (
-      <CardBody className="p-0" style={{ width: 600 }}>
-        <div className="modal-header">
-          <h5 className="modal-title" id="modal-action-title">
-            Thêm nhân viên
-          </h5>
-          <button onClick={() => closeModal()} type="button" className="close">
-            {" "}
-            <span aria-hidden="true">×</span>{" "}
-          </button>
-        </div>
-        <UsersAdd
-          closeModal={closeModal}
-          loadData={() => loadData()}
-          // place="add"
-        />
-        {loading && <Loader />}
-      </CardBody>
-    );
-  }
-
-  if (type === "delele_all") {
+  if (action?.type == "delete") {
     return (
       <CardBody className="p-0" style={{ width: 400 }}>
         <div className="modal-header" style={{ border: "none" }}>
@@ -589,20 +456,17 @@ const RenderActionModal = (props: any) => {
             className="text-center"
             style={{ color: "#C12818", fontSize: 24 }}
           >
-            Xóa nhiều nhân viên
+            Xóa tài khoản
           </h5>
           <p className="text-center" style={{ fontSize: 16 }}>
-            Bạn có muốn xóa{" "}
-            <b
-              style={{ color: "#272E35" }}
-            >{`${action?.data?.length} nhân viên`}</b>{" "}
-            đã chọn?
+            Bạn có muốn xóa tài khoản{" "}
+            <b style={{ color: "#272E35" }}>{`"${action?.data?.name}"`}</b>?
           </p>
         </div>
 
         <div className="modal-footer">
           <Button
-            onClick={handleDeleteAll}
+            onClick={handleDelete}
             className="ml-2 bilet_button"
             color="success"
             type="button"
@@ -623,113 +487,22 @@ const RenderActionModal = (props: any) => {
     );
   }
 
-  if (type === "stop_all") {
-    return (
-      <CardBody className="p-0" style={{ width: 400 }}>
-        <div className="modal-header" style={{ border: "none" }}>
-          <button onClick={() => closeModal()} type="button" className="close">
-            {" "}
-            <span aria-hidden="true">×</span>{" "}
-          </button>
-        </div>
-        <div className="d-flex justify-content-center">
-          <Avatar
-            className="d-flex justify-content-center align-items-center"
-            style={{ width: 60, height: 60, backgroundColor: "#FEF0C7" }}
-            icon={
-              <i
-                style={{ color: "#C12818", fontSize: 26 }}
-                className="uil-file-block-alt"
-              ></i>
-            }
-          />
-        </div>
-        <div className="p-3">
-          <h5
-            className="text-center"
-            style={{ color: "#C12818", fontSize: 24 }}
-          >
-            Ngưng nhiều nhân viên
-          </h5>
-          <p className="text-center" style={{ fontSize: 16 }}>
-            Bạn có muốn ngưng hoạt động{" "}
-            <b
-              style={{ color: "#272E35" }}
-            >{`${action?.data?.length} nhân viên`}</b>{" "}
-            đã chọn?
-          </p>
-        </div>
-
-        <div className="modal-footer">
-          <Button
-            onClick={handleStopAll}
-            className="ml-2 bilet_button"
-            color="success"
-            type="button"
-          >
-            Có
-          </Button>
-          <Button
-            onClick={closeModal}
-            className="ml-2 bilet_button outline"
-            color="success"
-            type="button"
-          >
-            Không
-          </Button>
-        </div>
-        {loading && <Loader />}
-      </CardBody>
-    );
-  }
   return (
-    <CardBody className="p-0" style={{ width: 400 }}>
-      <div className="modal-header" style={{ border: "none" }}>
+    <CardBody className="p-0" style={{ width: 600 }}>
+      <div className="modal-header">
+        <h5 className="modal-title" id="modal-action-title">
+          Thêm tài khoản
+        </h5>
         <button onClick={() => closeModal()} type="button" className="close">
           {" "}
           <span aria-hidden="true">×</span>{" "}
         </button>
       </div>
-      <div className="d-flex justify-content-center">
-        <Avatar
-          className="d-flex justify-content-center align-items-center"
-          style={{ width: 60, height: 60, backgroundColor: "#FEF0C7" }}
-          icon={
-            <i
-              style={{ color: "#C12818", fontSize: 26 }}
-              className="uil-trash-alt"
-            ></i>
-          }
-        />
-      </div>
-      <div className="p-3">
-        <h5 className="text-center" style={{ color: "#C12818", fontSize: 24 }}>
-          Xóa nhân viên
-        </h5>
-        <p className="text-center" style={{ fontSize: 16 }}>
-          Bạn có muốn xóa nhân viên{" "}
-          <b style={{ color: "#272E35" }}>{`"${action?.data?.name}"`}</b>?
-        </p>
-      </div>
-
-      <div className="modal-footer">
-        <Button
-          onClick={handleDelete}
-          className="ml-2 bilet_button"
-          color="success"
-          type="button"
-        >
-          Có
-        </Button>
-        <Button
-          onClick={closeModal}
-          className="ml-2 bilet_button outline"
-          color="success"
-          type="button"
-        >
-          Không
-        </Button>
-      </div>
+      <UsersAdd
+        closeModal={closeModal}
+        loadData={() => loadData()}
+        dataProps={action}
+      />
       {loading && <Loader />}
     </CardBody>
   );

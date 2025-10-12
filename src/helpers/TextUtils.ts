@@ -1,4 +1,4 @@
-import { clone, isEmpty, isNil, isNaN, find } from "lodash";
+import { clone, isEmpty, find } from "lodash";
 
 export default class TextUtils {
   static truncate = (string: string, length?: number, tail?: number) => {
@@ -188,7 +188,7 @@ export default class TextUtils {
     if (space) slug = slug.replace(/-/gi, "");
     return slug;
   }
-  static convertStringToHtml(htmlString:string) {
+  static convertStringToHtml(htmlString: string) {
     return htmlString.replace(/<\/?[^>]+(>|$)/g, "");
   }
 }

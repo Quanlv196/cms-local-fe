@@ -13,7 +13,7 @@ import Pagination from "../../../components/Pagination";
 import ModalPopup from "../../../components/ModalPopup";
 import Loader from "../../../components/Loader";
 import RowEmpty from "../../../components/RowEmpty";
-import BattalionAdd from "./BattalionAdd";
+import BattalionAdd from "./PlatoonAdd";
 import {
   ActionModal,
   DataFilterProps,
@@ -26,16 +26,18 @@ import {
   RenderActionModalProps,
 } from "../../../interfaces/common.interface";
 import { getLabelStatus } from "../../../components/LabelStatus";
+import { Company } from "../company/CompanyList";
 
-export interface Battalion extends IBaseOptions {
+export interface Platoon extends IBaseOptions {
   id?: number;
   name?: string;
+  company_id?: Company;
   status?: number;
 }
 
 const configPage = {
-  titlePage: "Danh sách tiểu đoàn",
-  pathPage: "/Battalion/list",
+  titlePage: "Danh sách trung đội",
+  pathPage: "/platoon/list",
   column: 4,
 };
 
@@ -44,7 +46,7 @@ const List: React.FC<ListProps> = (props) => {
     useState<QueryParams>(initialParams);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Battalion[]>([]);
+  const [data, setData] = useState<Platoon[]>([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [action, setAction] = useState<ActionModal>({ type: "add" });
   const [status, setStatus] = useState<number | null>(null);
@@ -119,7 +121,7 @@ const List: React.FC<ListProps> = (props) => {
   const loadData = async () => {
     const params = { page, limit, ...filter };
     if (!params.name) delete params.name;
-    const URL = `${baseUrl}/battalion`;
+    const URL = `${baseUrl}/platoon`;
     setFilterParams(params);
     setLoading(true);
     const response: any = await APIClient.GET(URL, params);
@@ -135,10 +137,10 @@ const List: React.FC<ListProps> = (props) => {
   return (
     <>
       <PageTitle
-        title="Quản lý tiểu đoàn"
+        title="Quản lý trung đội"
         breadCrumbItems={[
           { label: "Cấu hình", active: true },
-          { label: "Quản lý tiểu đoàn", active: true },
+          { label: "Quản lý trung đội", active: true },
         ]}
         rightContent={
           <div className="group__button">
@@ -147,7 +149,7 @@ const List: React.FC<ListProps> = (props) => {
               onClick={() => handleActionModal({ type: "add" })}
               className="bilet_button"
             >
-              <i className="uil-plus"></i> Thêm tiểu đoàn
+              <i className="uil-plus"></i> Thêm trung đội
             </Button>
           </div>
         }
@@ -232,7 +234,7 @@ const DataFilter: React.FC<DataFilterProps> = ({
                 onKeyPress={_onKeyPress}
                 onChange={(e) => setCode(e.target.value)}
                 value={code}
-                placeholder="Tìm kiếm tiểu đoàn"
+                placeholder="Tìm kiếm trung đội"
               />
             </Col>
             <Col md={2}>
@@ -261,15 +263,17 @@ const DataTableList: React.FC<DataTableListProps> = ({
   const start = limit * (page - 1);
   const router = useHistory();
 
-  const gotoDetail = (item: Battalion) => {
-    router.push(`/battalion/${item.id}/view`);
+  const gotoDetail = (item: Platoon) => {
+    router.push(`/platoon/${item.id}/view`);
   };
 
   const RenderHeadData = () => (
     <thead>
       <tr>
         <th style={{ minWidth: 50 }}>Stt</th>
-        <th style={{ minWidth: 120 }}>Tên tiểu đoàn</th>
+        <th style={{ minWidth: 120 }}>Tên trung đội</th>
+        <th style={{ minWidth: 120 }}>Đại đội</th>
+        <th style={{ minWidth: 120 }}>Tiểu đoàn</th>
         <th style={{ minWidth: 100 }}>Trạng thái</th>
         <th style={{ width: 60 }}></th>
       </tr>
@@ -291,6 +295,12 @@ const DataTableList: React.FC<DataTableListProps> = ({
           <tr key={item.id}>
             <td>{start + index + 1}</td>
             <td onClick={() => gotoDetail(item)}>{item.name || "---"}</td>
+            <td onClick={() => gotoDetail(item)}>
+              {item.company_id?.name || "---"}
+            </td>
+            <td onClick={() => gotoDetail(item)}>
+              {item.company_id?.battalion_id?.name || "---"}
+            </td>
             <td onClick={() => gotoDetail(item)}>
               {getLabelStatus(item?.status)}
             </td>
@@ -338,7 +348,7 @@ const RenderActionModal: React.FC<RenderActionModalProps> = ({
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    const URL = `${baseUrl}/battalion/${action?.data?.id}`;
+    const URL = `${baseUrl}/platoon/${action?.data?.id}`;
     setLoading(true);
     const response: any = await APIClient.DELETE(URL);
     setLoading(false);
@@ -347,7 +357,7 @@ const RenderActionModal: React.FC<RenderActionModalProps> = ({
     } else {
       closeModal();
       loadData();
-      toast.success("Xóa tiểu đoàn thành công!");
+      toast.success("Xóa trung đội thành công!");
     }
   };
 
@@ -376,10 +386,10 @@ const RenderActionModal: React.FC<RenderActionModalProps> = ({
             className="text-center"
             style={{ color: "#C12818", fontSize: 24 }}
           >
-            Xóa tiểu đoàn
+            Xóa trung đội
           </h5>
           <p className="text-center" style={{ fontSize: 16 }}>
-            Bạn có muốn xóa tiểu đoàn{" "}
+            Bạn có muốn xóa trung đội{" "}
             <b style={{ color: "#272E35" }}>{`"${action.data?.name}"`}</b>?
           </p>
         </div>
@@ -409,7 +419,7 @@ const RenderActionModal: React.FC<RenderActionModalProps> = ({
     <CardBody className="p-0" style={{ width: 600 }}>
       <div className="modal-header">
         <h5 className="modal-title">
-          {action.type === "add" ? "Thêm" : "Chỉnh sửa"} tiểu đoàn
+          {action.type === "add" ? "Thêm" : "Chỉnh sửa"} trung đội
         </h5>
         <button onClick={closeModal} type="button" className="close">
           <span aria-hidden="true">×</span>

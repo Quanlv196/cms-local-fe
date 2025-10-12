@@ -49,3 +49,8 @@ export interface DataFilterProps {
   setFilter: (filter: FilterParams) => void;
   loadData: () => void;
 }
+
+export interface IBaseOptions {
+  value?: string | number;
+  label?: string;
+}

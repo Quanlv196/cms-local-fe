@@ -116,7 +116,7 @@ const Pagination = memo((props: rootProps) => {
             } */}
       {!hideLimit && (
         <Col md={minimal ? 6 : 12} xs={12}>
-          <div className="d-flex align-items-center justify-content-end mt-3">
+          <div className="d-flex align-items-center justify-content-between mt-3">
             <p className="mb-0 mr-4">
               Tổng số: <span>{totalElements}</span> kết quả
             </p>

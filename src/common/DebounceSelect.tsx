@@ -10,7 +10,7 @@ export const DebounceSelect = ({
   debounceTimeout = 800,
   ...props
 }: any) => {
-  const { optionDefault, onlyView, value, hideClear, labelInValue } = props;
+  const { optionDefault, onlyView, value, labelInValue } = props;
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState(optionDefault);
   const fetchRef = React.useRef(0);
@@ -37,19 +37,40 @@ export const DebounceSelect = ({
   }, [fetchOptions, debounceTimeout, value]);
 
   const optionRenders = useMemo(() => {
-    const combined = [...(dataConcat || []), ...(options || [])]?.map(
-      (e: any) => {
-        return {
-          ...e,
-          value: e?.id || e?.value,
-          label: e?.name || e?.label,
-          optionData: e,
-        };
-      }
-    );
+    const values = !isNil(value)
+      ? props?.mode === "multiple"
+        ? value
+        : [value]
+      : [];
+    const combined = [...values, ...(options ?? [])]?.map((e: any) => {
+      return {
+        ...e,
+        value: e?.id ?? e?.value,
+        label: e?.name ?? e?.label,
+        optionData: e,
+      };
+    });
 
     return uniqBy(combined, "value");
-  }, [dataConcat, options]);
+  }, [value, options]);
+
+  const valueRender = useMemo(() => {
+    if (value) {
+      const valueFinal =
+        props?.mode === "multiple"
+          ? value
+          : [value]?.map((e: any) => {
+              return {
+                ...e,
+                value: e?.id || e?.value,
+                label: e?.name || e?.label,
+                optionData: e,
+              };
+            });
+      return valueFinal;
+    }
+    return value;
+  }, [value]);
 
   return (
     <Select
@@ -66,8 +87,8 @@ export const DebounceSelect = ({
           <Empty description="Không có dữ liệu" />
         )
       }
+      value={valueRender}
       showSearch
-      allowClear={!hideClear}
       style={{ fontSize: 16, width: "100%" }}
       dropdownStyle={{ minWidth: 500 }}
       options={optionRenders}

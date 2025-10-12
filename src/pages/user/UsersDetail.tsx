@@ -36,15 +36,15 @@ const List: React.FC<Props> = (props: any) => {
       loadData(idMember ? idMember : id);
       if (type === "view") {
         setOnlyView(true);
-        document.title = "Chi tiết nhân viên";
-        setTilePage("Chi tiết nhân viên");
+        document.title = "Chi tiết tài khoản";
+        setTilePage("Chi tiết tài khoản");
       } else {
-        document.title = "Chỉnh sửa nhân viên";
-        setTilePage("Chỉnh sửa nhân viên");
+        document.title = "Chỉnh sửa tài khoản";
+        setTilePage("Chỉnh sửa tài khoản");
       }
     } else {
-      document.title = "Tạo mới nhân viên";
-      setTilePage("Tạo mới nhân viên");
+      document.title = "Tạo mới tài khoản";
+      setTilePage("Tạo mới tài khoản");
     }
   }, [id]);
 
@@ -84,7 +84,7 @@ const List: React.FC<Props> = (props: any) => {
         <PageTitle
           title={titlePage}
           breadCrumbItems={[
-            { label: "Quản lý nhân viên", path: "/user" },
+            { label: "Quản lý tài khoản", path: "/user" },
             { label: titlePage, active: true },
           ]}
         />
@@ -124,7 +124,7 @@ const ContentPage = (props: any) => {
     <div className={onlyView ? "detail__page" : "detail__page"}>
       <PageBody>
         <Tabs className="tab__info" defaultActiveKey={"info"}>
-          <TabPane tab="Thông tin nhân viên" key="info">
+          <TabPane tab="Thông tin tài khoản" key="info">
             <Form
               ref={formRef}
               wrapperCol={{ flex: 1 }}
@@ -167,7 +167,7 @@ const RenderActionModal = (props: any) => {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
       closeModal();
-      toast.success("Xóa nhân viên thành công!");
+      toast.success("Xóa tài khoản thành công!");
       router?.push(`/bilet/student/list`);
     }
   };
@@ -217,7 +217,7 @@ const RenderActionModal = (props: any) => {
             Reset mật khẩu
           </h5>
           <p className="text-center" style={{ fontSize: 16 }}>
-            Bạn có muốn reset mật khẩu nhân viên{" "}
+            Bạn có muốn reset mật khẩu tài khoản{" "}
             <b style={{ color: "#272E35" }}>{`"${action?.data?.name}"`}</b>?
           </p>
         </div>
@@ -265,10 +265,10 @@ const RenderActionModal = (props: any) => {
       </div>
       <div className="p-3">
         <h5 className="text-center" style={{ color: "#C12818", fontSize: 24 }}>
-          Xóa nhân viên
+          Xóa tài khoản
         </h5>
         <p className="text-center" style={{ fontSize: 16 }}>
-          Bạn có muốn xóa nhân viên{" "}
+          Bạn có muốn xóa tài khoản{" "}
           <b style={{ color: "#272E35" }}>{`"${action?.data?.name}"`}</b>?
         </p>
       </div>
