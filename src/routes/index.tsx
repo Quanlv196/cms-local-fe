@@ -17,6 +17,10 @@ const UsersList = React.lazy(() => import("../pages/user/UsersList"));
 const UsersAdd = React.lazy(() => import("../pages/user/UsersAdd"));
 const UsersDetail = React.lazy(() => import("../pages/user/UsersDetail"));
 
+// Employee
+const EmployeeList = React.lazy(() => import("../pages/employee/EmployeeList"));
+const EmployeeAdd = React.lazy(() => import("../pages/employee/EmployeeAdd"));
+
 //Battalion
 const BattalionList = React.lazy(
   () => import("../pages/configs/battalion/BattalionList")
@@ -69,21 +73,6 @@ const PrivateRoute = (props: PrivateRouteProps) => {
           );
         }
         return <Component {...props} dataFromRouter={dataFromRouter} />;
-        // if (checkRole(user?.roles, roles)) {
-        //   return <Component {...props} dataFromRouter={dataFromRouter} />;
-        // } else {
-        //   return <Redirect to={{ pathname: "/account" }} />;
-        // }
-        // const role = user?.roles?user?.roles[0]:'anonymous'
-        // // check if route is restricted by role
-        // // console.log('PrivateRoute',roles,role,user,access_token)
-        // if (roles && roles.indexOf(role) === -1) {
-        //     // role not authorised so redirect to home page
-        //     return <Redirect to={{ pathname: '/account' }} />;
-        // }
-
-        // // authorised so return component
-        // return <Component {...props} />;
       }}
     />
   );
@@ -127,7 +116,7 @@ const UsersRouter = {
   path: "/user",
   pathParam: "/user/list",
   name: "Quản lý tài khoản",
-  icon: FeatherIcon.User,
+  icon: FeatherIcon.Clipboard,
   children: [
     {
       path: "/user/list",
@@ -150,22 +139,49 @@ const UsersRouter = {
   ],
 };
 
+const EmployeeRouter = {
+  path: "/employee",
+  pathParam: "/employee/list",
+  name: "Quản lý quân nhân",
+  icon: FeatherIcon.User,
+  children: [
+    {
+      path: "/employee/list",
+      component: EmployeeList,
+      route: PrivateRoute,
+      hide: true,
+    },
+    {
+      pathParam: "/employee/:id/:action",
+      component: EmployeeAdd,
+      route: PrivateRoute,
+      hide: true,
+    },
+    {
+      pathParam: "/employee/:id",
+      component: EmployeeAdd,
+      route: PrivateRoute,
+      hide: true,
+    },
+  ],
+};
+
 const BattalionRouter = [
   {
     name: "Quản lý tiểu đoàn",
-    path: "/battalion/list",
+    path: "/configs/battalion/list",
     component: BattalionList,
     route: PrivateRoute,
   },
   {
     name: "Quản lý đại đội",
-    path: "/company/list",
+    path: "/configs/company/list",
     component: CompanyList,
     route: PrivateRoute,
   },
   {
     name: "Quản lý trung đội",
-    path: "/platoon/list",
+    path: "/configs/platoon/list",
     component: PlatoonList,
     route: PrivateRoute,
   },
@@ -187,7 +203,7 @@ const notFoundRoute = {
   route: PrivateRoute,
 };
 
-const appRoutes = [UsersRouter, ConfigsRouter];
+const appRoutes = [UsersRouter, EmployeeRouter, ConfigsRouter];
 
 // flatten the list of all nested routes
 interface routesItem {

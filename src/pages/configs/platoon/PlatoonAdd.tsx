@@ -22,7 +22,7 @@ const List = (props: IDetailProps) => {
   const { closeModal, loadData, dataProps } = props;
   const [loading, setLoading] = useState<any>(false);
   const [data, setData] = useState<Platoon>({});
-  const [company, setCompnay] = useState<Company[]>([]);
+  const [company, setCompany] = useState<Company[]>([]);
   const formRef = useRef<any>(null);
 
   const handleChangeInput = (event?: any) => {
@@ -53,7 +53,7 @@ const List = (props: IDetailProps) => {
     if (response.error) {
       toast.error(response.error.error_description);
     } else if (response.response) {
-      setCompnay(response.response?.data);
+      setCompany(response.response?.data);
     }
   };
 
