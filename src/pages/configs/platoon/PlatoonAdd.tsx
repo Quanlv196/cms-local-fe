@@ -74,7 +74,7 @@ const List = (props: IDetailProps) => {
     const URL = `${baseUrl}/platoon/${data?.id}`;
     const params: any = {
       name: data?.name,
-      company_id: data?.company_id?.value,
+      company_id: data?.company_id?.value ?? data?.company_id?.id,
     };
     setLoading(true);
     let response: any = await APIClient.PUT(URL, params);

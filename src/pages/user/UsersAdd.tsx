@@ -4,14 +4,14 @@ import { toast } from "react-toastify";
 import { Button } from "reactstrap";
 import { baseUrl } from "../../constants/environment";
 import APIClient from "../../helpers/APIClient";
-import UserManager from "../../manager/UserManager";
 import Loader from "../../components/Loader";
 import { useForm } from "antd/lib/form/Form";
 import { Platoon } from "../configs/platoon/PlatoonList";
 import { Company } from "../configs/company/CompanyList";
 import { Battalion } from "../configs/battalion/BattalionList";
 import { DebounceSelect } from "../../common/DebounceSelect";
-import { IBaseOptions } from "../../interfaces/common.interface";
+import { IBaseOptions, ISelectOption } from "../../interfaces/common.interface";
+import UserManager from "../../manager/UserManager";
 
 interface IUser extends IBaseOptions {
   id?: number;
@@ -19,9 +19,12 @@ interface IUser extends IBaseOptions {
   username?: string;
   password?: string;
   status?: number;
-  company_id?: Company | null;
-  platoon_id?: Platoon | null;
-  battalion_id?: Battalion | null;
+  company?: Company | null;
+  platoon?: Platoon | null;
+  battalion?: Battalion | null;
+  company_id?: number | ISelectOption | null;
+  platoon_id?: number | ISelectOption | null;
+  battalion_id?: number | ISelectOption | null;
 }
 
 const List = (props: any) => {
@@ -38,6 +41,8 @@ const List = (props: any) => {
     fetchCompany();
     fetchBattalion();
   }, []);
+
+  console.log("dataxxx", data);
 
   const fetchPlatoon = async (name?: string, company_id?: number) => {
     const URL = `${baseUrl}/platoon`;
@@ -108,13 +113,24 @@ const List = (props: any) => {
   const handleEdit = async () => {
     await form?.validateFields();
     const URL = `${baseUrl}/user/${data?.id}`;
+    console.log("dataxx", data);
     const params: any = {
       name: data?.name,
       username: data?.username,
       password: data?.password,
-      platoon_id: data?.platoon_id?.value ?? null,
-      company_id: data?.company_id?.value ?? null,
-      battalion_id: data?.battalion_id?.value ?? null,
+      platoon_id:
+        (data?.platoon_id as ISelectOption)?.value ??
+        (data?.platoon_id as ISelectOption)?.id ??
+        null,
+      company_id:
+        (data?.company_id as ISelectOption)?.value ??
+        (data?.company_id as ISelectOption)?.id ??
+        null,
+      battalion_id:
+        (data?.battalion_id as ISelectOption)?.value ??
+        (data?.battalion_id as ISelectOption)?.id ??
+        null,
+      status: data?.status,
     };
 
     setLoading(true);
@@ -135,9 +151,10 @@ const List = (props: any) => {
     const URL = `${baseUrl}/user`;
     const params: any = {
       ...data,
-      platoon_id: data?.platoon_id?.value ?? null,
-      company_id: data?.company_id?.value ?? null,
-      battalion_id: data?.battalion_id?.value ?? null,
+      platoon_id: (data?.platoon_id as ISelectOption)?.value ?? null,
+      company_id: (data?.company_id as ISelectOption)?.value ?? null,
+      battalion_id: (data?.battalion_id as ISelectOption)?.value ?? null,
+      status: data?.status ?? 1,
     };
     setLoading(true);
     let response: any = await APIClient.POST(URL, params);
@@ -161,6 +178,7 @@ const List = (props: any) => {
       fields={[
         { name: "password", value: data?.password },
         { name: "username", value: data?.username },
+        { name: "name", value: data?.name },
       ]}
     >
       <div className={"form__box p-3"}>
@@ -196,7 +214,11 @@ const List = (props: any) => {
             placeholder="Nhập mật khẩu"
           />
         </Form.Item>
-        <Form.Item label="Tên người dùng">
+        <Form.Item
+          label="Tên người dùng"
+          name={"name"}
+          rules={[{ required: true, message: "Tên người dùng là bắt buộc" }]}
+        >
           <Input
             onChange={(e: any) => handleChangeInput(e)}
             allowClear
@@ -211,12 +233,13 @@ const List = (props: any) => {
         <Form.Item label="Tiểu đoàn">
           <DebounceSelect
             value={data?.battalion_id}
-            placeholder="Tìm kiếm"
+            placeholder="Chọn tiểu đoàn"
+            allowClear
             fetchOptions={fetchBattalion}
             onChange={(dt: any) => {
               setData({
                 ...data,
-                battalion_id: dt,
+                battalion_id: dt ?? null,
                 company_id: null,
                 platoon_id: null,
               });
@@ -229,10 +252,11 @@ const List = (props: any) => {
         <Form.Item label="Đại đội">
           <DebounceSelect
             value={data?.company_id}
-            placeholder="Tìm kiếm"
+            placeholder="Chọn đại đội"
             fetchOptions={fetchCompany}
+            allowClear
             onChange={(dt: any) => {
-              setData({ ...data, company_id: dt, platoon_id: null });
+              setData({ ...data, company_id: dt ?? null, platoon_id: null });
               fetchPlatoon("", dt?.value);
             }}
             style={{ width: "100%" }}
@@ -242,9 +266,10 @@ const List = (props: any) => {
         <Form.Item label="Trung đội">
           <DebounceSelect
             value={data?.platoon_id}
-            placeholder="Tìm kiếm"
+            placeholder="Chọn trung đội"
+            allowClear
             fetchOptions={fetchPlatoon}
-            onChange={(dt: any) => setData({ ...data, platoon_id: dt })}
+            onChange={(dt: any) => setData({ ...data, platoon_id: dt ?? null })}
             style={{ width: "100%" }}
             optionDefault={platoon}
           />

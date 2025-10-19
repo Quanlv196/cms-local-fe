@@ -43,39 +43,63 @@ export const DebounceSelect = ({
     return debounce(loadOptions, debounceTimeout);
   }, [fetchOptions, debounceTimeout]);
 
-  console.log("fetchOptionsxx", fetchOptions, optionDefault);
-
-  // 🔹 Kết hợp giá trị hiện tại + danh sách options
   const optionRenders = useMemo(() => {
+    // 🔹 Chuẩn hóa từng option (kể cả khi optionDefault là object có id/name)
+    const normalizeOption = (e: any) => {
+      if (typeof e === "string" || typeof e === "number") {
+        return { value: e, label: e };
+      }
+      return {
+        ...e,
+        value: e?.id ?? e?.value,
+        label: e?.name ?? e?.label,
+        optionData: e,
+      };
+    };
+
+    // 🔹 Nếu labelInValue = false → value là string hoặc string[]
+    // chỉ cần hiển thị options (không cần thêm value vào)
+    if (!labelInValue) {
+      return (options ?? []).map(normalizeOption);
+    }
+
+    // 🔹 Ngược lại: labelInValue = true → cần kết hợp value + options
     const values = !isNil(value)
       ? props?.mode === "multiple"
         ? value
         : [value]
       : [];
 
-    const combined = [...values, ...(options ?? [])].map((e: any) => ({
-      ...e,
-      value: e?.id ?? e?.value,
-      label: e?.name ?? e?.label,
-      optionData: e,
-    }));
-
+    const combined = [...values, ...(options ?? [])].map(normalizeOption);
     return uniqBy(combined, "value");
-  }, [value, options]);
+  }, [value, options, labelInValue, props?.mode]);
 
-  // 🔹 Chuẩn hóa value để hiển thị
+  // 🔹 Chuẩn hóa value để hiển thị (xử lý cả trường hợp labelInValue = false)
   const valueRender = useMemo(() => {
     if (!value) return value;
-    if (props?.mode === "multiple") return value;
-    return [
-      {
-        ...value,
-        value: value?.id || value?.value,
-        label: value?.name || value?.label,
-        optionData: value,
-      },
-    ];
-  }, [value]);
+
+    // 🔹 Nếu labelInValue = false → giữ nguyên string hoặc string[]
+    if (labelInValue === false) return value;
+
+    // 🔹 Nếu labelInValue = true → chuẩn hóa object
+    if (props?.mode === "multiple") {
+      return value.map((v: any) => ({
+        ...v,
+        value: v?.id ?? v?.value,
+        label: v?.name ?? v?.label,
+        optionData: v,
+      }));
+    }
+
+    return {
+      ...value,
+      value: value?.id ?? value?.value,
+      label: value?.name ?? value?.label,
+      optionData: value,
+    };
+  }, [value, labelInValue, props?.mode]);
+
+  console.log("fetchOptionsxx", valueRender, optionRenders);
 
   // 🔹 Hàm lọc mặc định có xử lý tiếng Việt (nếu không có fetchOptions)
   const filterOptionVi = (input: string, option: any) => {

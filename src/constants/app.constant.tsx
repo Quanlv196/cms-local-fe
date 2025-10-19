@@ -56,7 +56,10 @@ export const REGILION_OPTIONS = [
   { value: "thien_chua_giao", label: "Thiên chúa giáo" },
   { value: "none", label: "Không" },
 ];
-
+export const STATUS_OPTIONS = [
+  { value: "1", label: "Hoạt động" },
+  { value: "0", label: "Ngưng" },
+];
 export const OBJECT_OPTIONS = [
   { value: "sq", label: "Sĩ Quan" },
   { value: "qncn", label: "Quân nhân chuyên nghiệp" },

@@ -24,6 +24,8 @@
 
 .content-page {
   margin-top: 55px;
+  height: calc(100dvh - 55px);
+  overflow: auto;
 }
 
 .navbar-custom .button-menu-mobile {
@@ -863,12 +865,15 @@ h3,
 }
 
 .demo-editor {
-  height: 250px !important;
+  min-height: 200px !important;
+  max-height: 300px !important;
   border: 1px solid #f1f1f1 !important;
-  padding: 5px !important;
+  padding: 10px !important;
   border-radius: 2px !important;
 }
-
+.public-DraftStyleDefault-block {
+  margin: 0 !important;
+}
 .input-group-text {
   background: none;
 }
@@ -1584,6 +1589,11 @@ h3,
 
 .libet-table {
   tr {
+    th {
+      position: sticky;
+      top: -1px;
+      z-index: 8;
+    }
     &.active {
       td {
         background: #edf7e6;
@@ -2055,44 +2065,8 @@ span.require {
     }
   }
 
-  &.no-bg {
-    tbody {
-      tr {
-        &:hover {
-          td {
-            background: none;
-
-            input,
-            .react-select__control {
-              &:hover,
-              &:focus {
-                border-color: #48a800 !important;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
   tbody {
     tr {
-      &:hover {
-        td {
-          background: #0092e015;
-          cursor: pointer;
-
-          .add_row {
-            visibility: visible;
-            opacity: 1;
-          }
-
-          &.no-data {
-            background: none;
-          }
-        }
-      }
-
       td {
         padding: 10px;
         position: relative;
@@ -2413,7 +2387,7 @@ span.require {
     border-radius: 8px;
 
     .card-body {
-      padding: 1.5rem;
+      padding: 20px;
     }
   }
 }
@@ -2765,6 +2739,11 @@ span.require {
 
 .detail__page {
   padding-bottom: 80px;
+}
+.libet-table.h-380 {
+  .table-responsive {
+    height: calc(100dvh - 321px);
+  }
 }
 
 .upload__file {

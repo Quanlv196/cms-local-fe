@@ -23,6 +23,8 @@ import { Company } from "../configs/company/CompanyList";
 import { Platoon } from "../configs/platoon/PlatoonList";
 import EditorComponent from "../../common/EditorComponent";
 import { isNil } from "lodash";
+import DataUtils from "../../helpers/DataUtils";
+import moment from "moment";
 
 interface Props {
   history: any;
@@ -100,14 +102,22 @@ const List: React.FC<Props> = (props: any) => {
   };
 
   const loadData = async (id: number) => {
-    const url = `${baseUrl}/admin/quote/${id}`;
+    const url = `${baseUrl}/employee/${id}`;
     setLoading(true);
     let response: any = await APIClient.GET(url);
     setLoading(false);
     if (response.error !== undefined) {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
-      setData(response.response);
+      const resData = response.response;
+      setData({
+        ...resData,
+        platoon_id: resData?.platoon,
+        company_id: resData?.company,
+        battalion_id: resData?.battalion,
+      });
+      fetchCompany("", resData?.battalion?.id);
+      fetchPlatoon("", resData?.company?.id);
     }
   };
 
@@ -161,7 +171,6 @@ const ContentPage = (props: any) => {
   const [loading, setLoading] = useState(false);
   const router = useHistory();
   const formRef = useRef<any>(null);
-  const { TextArea } = Input;
 
   const handleChangeInput = (event?: any) => {
     let { value, name } = event.target;
@@ -174,11 +183,13 @@ const ContentPage = (props: any) => {
 
   const handleSubmit = async () => {
     await formRef?.current?.validateFields();
-    const URL = `${baseUrl}/admin/quote`;
-    const params = {
+    const URL = `${baseUrl}/employee`;
+    const params = DataUtils.formatDataForAPI({
       ...data,
-      status: data?.status ? data?.status : 0,
-    };
+      birthday: moment(data?.birthday).valueOf(),
+      position_time: moment(data?.position_time).valueOf(),
+      role_time: moment(data?.role_time).valueOf(),
+    });
     setLoading(true);
     let response: any = await APIClient.POST(URL, params);
     setLoading(false);
@@ -186,16 +197,19 @@ const ContentPage = (props: any) => {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
       toast.success("Thêm mới quân nhân thành công");
-      router?.push(`/bi_admin/quote/${response.response?.id}/view`);
+      router?.push(`/employee/list`);
     }
   };
 
   const handleEdit = async () => {
     await formRef?.current?.validateFields();
-    const URL = `${baseUrl}/admin/quote/${data?.id}`;
-    const params = {
+    const URL = `${baseUrl}/employee/${data?.id}`;
+    const params = DataUtils.formatDataForAPI({
       ...data,
-    };
+      birthday: moment(data?.birthday).valueOf(),
+      position_time: moment(data?.position_time).valueOf(),
+      role_time: moment(data?.role_time).valueOf(),
+    });
     setLoading(true);
     delete params?.code;
     delete params?.created_time;
@@ -209,9 +223,11 @@ const ContentPage = (props: any) => {
       toast.error(response.error.error_description);
     } else if (response.response !== undefined) {
       toast.success("Chỉnh sửa quân nhân thành công");
-      router?.push(`/bi_admin/quote/${response.response?.id}/view`);
+      router?.push(`/employee/list`);
     }
   };
+
+  console.log("dataxxx", data?.role_time, moment(data?.role_time));
 
   return (
     <div className="detail__page" style={{ margin: 20 }}>
@@ -222,9 +238,30 @@ const ContentPage = (props: any) => {
         autoComplete="off"
         className="form_normal"
         fields={[
-          { name: "name_vi", value: data.name_vi },
-          { name: "name_en", value: data.name_en },
-          { name: "author", value: data.author },
+          { name: "name", value: data.name },
+          {
+            name: "birthday",
+            value: data.birthday ? moment(data.birthday) : null,
+          },
+          { name: "company_id", value: data.company_id },
+          { name: "current_residence", value: data.current_residence },
+          { name: "home_town", value: data.home_town },
+          { name: "mission_result", value: data.mission_result },
+          { name: "platoon_id", value: data.platoon_id },
+          { name: "battalion_id", value: data.battalion_id },
+          { name: "position", value: data.position },
+          {
+            name: "position_time",
+            value: data.position_time ? moment(data.position_time) : null,
+          },
+          { name: "object", value: data.object },
+          { name: "nation", value: data.nation },
+          { name: "religion", value: data.religion },
+          { name: "role", value: data.role },
+          {
+            name: "role_time",
+            value: data.role_time ? moment(data.role_time) : null,
+          },
         ]}
       >
         <Row gutter={[20, 20]}>
@@ -237,7 +274,7 @@ const ContentPage = (props: any) => {
                     label="Họ và tên quân nhân"
                     name="name"
                     rules={[
-                      { required: true, message: "Năm sinh là bắt buộc" },
+                      { required: true, message: "Họ và tên là bắt buộc" },
                     ]}
                   >
                     <Input
@@ -318,6 +355,7 @@ const ContentPage = (props: any) => {
                   >
                     <DebounceSelect
                       value={data?.nation}
+                      labelInValue={false}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
                         setData({
@@ -339,6 +377,7 @@ const ContentPage = (props: any) => {
                     ]}
                   >
                     <DebounceSelect
+                      labelInValue={false}
                       value={data?.religion}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
@@ -366,6 +405,7 @@ const ContentPage = (props: any) => {
                     ]}
                   >
                     <DebounceSelect
+                      labelInValue={false}
                       value={data?.object}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
@@ -387,6 +427,7 @@ const ContentPage = (props: any) => {
                   >
                     <DebounceSelect
                       value={data?.role}
+                      labelInValue={false}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
                         setData({
@@ -412,7 +453,7 @@ const ContentPage = (props: any) => {
                   >
                     <DatePicker
                       picker="month"
-                      value={data?.role_time}
+                      value={data?.role_time ?? null}
                       format={"MM/YYYY"}
                       disabledDate={(current) =>
                         current && current.year() > new Date().getFullYear()
@@ -434,6 +475,7 @@ const ContentPage = (props: any) => {
                     rules={[{ required: true, message: "Chức vụ là bắt buộc" }]}
                   >
                     <DebounceSelect
+                      labelInValue={false}
                       value={data?.position}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
@@ -529,6 +571,7 @@ const ContentPage = (props: any) => {
                   >
                     <DebounceSelect
                       value={data?.mission_result}
+                      labelInValue={false}
                       placeholder="Tìm kiếm"
                       onChange={(dt: any) => {
                         setData({
@@ -570,7 +613,7 @@ const ContentPage = (props: any) => {
                     <Checkbox
                       checked={data?.is_care}
                       onChange={(event: any) =>
-                        setData({ ...data, status: event?.target?.checked })
+                        setData({ ...data, is_care: event?.target?.checked })
                       }
                     >
                       Đánh dấu cần được quan tâm
@@ -581,7 +624,7 @@ const ContentPage = (props: any) => {
             </PageBody>
           </Col>
           <Col xxl={6} md={8}>
-            <PageBody className="m-0">
+            <PageBody className="m-0" style={{ position: "sticky", top: 20 }}>
               <h3>Thông tin đơn vị</h3>
               <Row gutter={[20, 0]} align="middle">
                 <Col md={24} xs={24}>
@@ -600,6 +643,8 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           battalion_id: dt,
+                          company_id: null,
+                          platoon_id: null,
                         });
                         fetchCompany("", dt?.value);
                       }}
@@ -627,6 +672,7 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           company_id: dt,
+                          platoon_id: null,
                         });
                         fetchPlatoon("", dt?.value);
                       }}

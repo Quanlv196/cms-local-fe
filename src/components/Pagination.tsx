@@ -93,11 +93,10 @@ const Pagination = memo((props: rootProps) => {
     TEXT_NEXT_PAGE = ">";
   }
 
-  console.log("pagexxx", page, totalElements);
-
   return (
-    <Row className="justify-content-between">
-      {/* {
+    <div className="mt-2">
+      <Row className="justify-content-between">
+        {/* {
                 !hideLimit &&
                 <Col md={2} xs={12}>
                     <Select
@@ -114,34 +113,14 @@ const Pagination = memo((props: rootProps) => {
                     ></Select>
                 </Col>
             } */}
-      {!hideLimit && (
-        <Col md={minimal ? 6 : 12} xs={12}>
-          <div className="d-flex align-items-center justify-content-between mt-3">
-            <p className="mb-0 mr-4">
-              Tổng số: <span>{totalElements}</span> kết quả
-            </p>
-            <Select
-              className="react-select pagination-count"
-              classNamePrefix="react-select"
-              style={{ width: 120 }}
-              options={numpagelist || optionsPagination}
-              defaultValue={limit}
-              value={(
-                (numpagelist && numpagelist) ||
-                (optionsPagination && optionsPagination)
-              ).filter((option: any) => option.value == limit)}
-              onChange={(val) => {
-                setLimit(val.value);
-                type != "noresetpage" && setPage(1);
-              }}
-              menuPlacement="top"
-            ></Select>
-          </div>
-        </Col>
-      )}
-      <Col md={minimal ? 6 : 12} xs={12}>
-        <ul className="pagination mt-3 mb-2 justify-content-center">
-          {/* {
+        {!hideLimit && (
+          <Col md={minimal ? 6 : 12} xs={12}>
+            <div className="d-flex align-items-center justify-content-between">
+              <p className="mb-0 mr-4">
+                Tổng số: <span>{totalElements}</span> kết quả
+              </p>
+              <ul className="pagination justify-content-center">
+                {/* {
                         pagination && pagination.map((item, i) => (
                             item.page === 1 &&
                             <li key={item.page} className={`paginate_button page-item ${!previous && "disabled"}`}>
@@ -152,137 +131,137 @@ const Pagination = memo((props: rootProps) => {
                             </li>
                         ))
                     } */}
-          {!minimal && !isEmpty(pagination) && (
-            <li
-              className={`paginate_button page-item previous ${
-                !previous && "disabled"
-              }`}
-            >
-              <Link
-                to={`${link}?page=${page - 1}`}
-                onClick={() => {
-                  {
-                    setPage(page - 1);
-                  }
-                }}
-                className="page-link"
-              >
-                {isMobile ? "<" : TEXT_PREVIOUS_PAGE}
-              </Link>
-            </li>
-          )}
-          {pagination &&
-            pagination.map(
-              (item, i) =>
-                item.page <= page &&
-                item.page >= page - 3 && (
+                {!minimal && !isEmpty(pagination) && (
                   <li
-                    key={item.page}
-                    className={`paginate_button page-item ${
-                      item.page === page && "active"
+                    className={`paginate_button page-item previous ${
+                      !previous && "disabled"
+                    }`}
+                  >
+                    <Link
+                      to={`${link}?page=${page - 1}`}
+                      onClick={() => {
+                        {
+                          setPage(page - 1);
+                        }
+                      }}
+                      className="page-link"
+                    >
+                      {isMobile ? "<" : TEXT_PREVIOUS_PAGE}
+                    </Link>
+                  </li>
+                )}
+                {pagination &&
+                  pagination.map(
+                    (item, i) =>
+                      item.page <= page &&
+                      item.page >= page - 3 && (
+                        <li
+                          key={item.page}
+                          className={`paginate_button page-item ${
+                            item.page === page && "active"
+                          }`}
+                        >
+                          {link ? (
+                            <Link
+                              to={`${link}?page=${item.page}`}
+                              onClick={() => {
+                                {
+                                  item.page !== page && setPage(item.page);
+                                }
+                              }}
+                              className="page-link"
+                            >
+                              {item.page}
+                            </Link>
+                          ) : (
+                            <a
+                              href="javascript:;"
+                              onClick={() => {
+                                {
+                                  item.page !== page && setPage(item.page);
+                                }
+                              }}
+                              className="page-link"
+                            >
+                              {item.page}
+                            </a>
+                          )}
+                        </li>
+                      )
+                  )}
+                {pagination &&
+                  pagination.map(
+                    (item, i) =>
+                      item.page > page &&
+                      item.page <= page + 3 && (
+                        <li
+                          key={item.page}
+                          className={`paginate_button page-item ${
+                            item.page === page && "active"
+                          }`}
+                        >
+                          {link ? (
+                            <Link
+                              to={`${link}?page=${item.page}`}
+                              onClick={() => {
+                                {
+                                  item.page !== page && setPage(item.page);
+                                }
+                              }}
+                              className="page-link"
+                            >
+                              {item.page}
+                            </Link>
+                          ) : (
+                            <a
+                              href="javascript:;"
+                              onClick={() => {
+                                {
+                                  item.page !== page && setPage(item.page);
+                                }
+                              }}
+                              className="page-link"
+                            >
+                              {item.page}
+                            </a>
+                          )}
+                        </li>
+                      )
+                  )}
+                {!minimal && !isEmpty(pagination) && (
+                  <li
+                    className={`paginate_button page-item next ${
+                      !next && "disabled"
                     }`}
                   >
                     {link ? (
                       <Link
-                        to={`${link}?page=${item.page}`}
+                        to={`${link}?page=${page + 1}`}
                         onClick={() => {
                           {
-                            item.page !== page && setPage(item.page);
+                            setPage(page + 1);
                           }
                         }}
                         className="page-link"
                       >
-                        {item.page}
+                        {isMobile ? ">" : TEXT_NEXT_PAGE}
                       </Link>
                     ) : (
                       <a
                         href="javascript:;"
                         onClick={() => {
                           {
-                            item.page !== page && setPage(item.page);
+                            setPage(page + 1);
                           }
                         }}
                         className="page-link"
                       >
-                        {item.page}
+                        {isMobile ? ">" : TEXT_NEXT_PAGE}
                       </a>
                     )}
                   </li>
-                )
-            )}
-          {pagination &&
-            pagination.map(
-              (item, i) =>
-                item.page > page &&
-                item.page <= page + 3 && (
-                  <li
-                    key={item.page}
-                    className={`paginate_button page-item ${
-                      item.page === page && "active"
-                    }`}
-                  >
-                    {link ? (
-                      <Link
-                        to={`${link}?page=${item.page}`}
-                        onClick={() => {
-                          {
-                            item.page !== page && setPage(item.page);
-                          }
-                        }}
-                        className="page-link"
-                      >
-                        {item.page}
-                      </Link>
-                    ) : (
-                      <a
-                        href="javascript:;"
-                        onClick={() => {
-                          {
-                            item.page !== page && setPage(item.page);
-                          }
-                        }}
-                        className="page-link"
-                      >
-                        {item.page}
-                      </a>
-                    )}
-                  </li>
-                )
-            )}
-          {!minimal && !isEmpty(pagination) && (
-            <li
-              className={`paginate_button page-item next ${
-                !next && "disabled"
-              }`}
-            >
-              {link ? (
-                <Link
-                  to={`${link}?page=${page + 1}`}
-                  onClick={() => {
-                    {
-                      setPage(page + 1);
-                    }
-                  }}
-                  className="page-link"
-                >
-                  {isMobile ? ">" : TEXT_NEXT_PAGE}
-                </Link>
-              ) : (
-                <a
-                  href="javascript:;"
-                  onClick={() => {
-                    {
-                      setPage(page + 1);
-                    }
-                  }}
-                  className="page-link"
-                >
-                  {isMobile ? ">" : TEXT_NEXT_PAGE}
-                </a>
-              )}
-            </li>
-          )}
-          {/* {
+                )}
+                {/* {
                         pagination && pagination.map((item, i) => (
                             item.page === pagination.length &&
                             <li key={item.page} className={`paginate_button page-item ${item.page === page && "disabled"}`}>
@@ -293,9 +272,28 @@ const Pagination = memo((props: rootProps) => {
                             </li>
                         ))
                     } */}
-        </ul>
-      </Col>
-    </Row>
+              </ul>
+              <Select
+                className="react-select pagination-count"
+                classNamePrefix="react-select"
+                style={{ width: 120 }}
+                options={numpagelist || optionsPagination}
+                defaultValue={limit}
+                value={(
+                  (numpagelist && numpagelist) ||
+                  (optionsPagination && optionsPagination)
+                ).filter((option: any) => option.value == limit)}
+                onChange={(val) => {
+                  setLimit(val.value);
+                  type != "noresetpage" && setPage(1);
+                }}
+                menuPlacement="top"
+              ></Select>
+            </div>
+          </Col>
+        )}
+      </Row>
+    </div>
   );
 });
 export default Pagination;

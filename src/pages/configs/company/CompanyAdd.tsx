@@ -73,7 +73,7 @@ const List = (props: IDetailProps) => {
     const URL = `${baseUrl}/company/${data?.id}`;
     const params: any = {
       name: data?.name,
-      battalion_id: data?.battalion_id?.value,
+      battalion_id: data?.battalion_id?.value ?? data?.battalion_id?.id,
     };
     setLoading(true);
     let response: any = await APIClient.PUT(URL, params);

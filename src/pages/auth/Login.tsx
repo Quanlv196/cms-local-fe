@@ -22,8 +22,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser, logoutUser } from "../../redux/actions";
 import { isUserAuthenticated } from "../../helpers/authUtils";
 import Loader from "../../components/Loader";
-import logo from "../../assets/images/bilet/logo-white.png";
-import slogan from "../../assets/images/bilet/login/icon_login_footer.png";
 import { isEmpty } from "lodash";
 import APIClient from "../../helpers/APIClient";
 import { baseUrl } from "../../constants/environment";
@@ -129,9 +127,9 @@ const Login: React.FC = () => {
           <ParticleBackground />
           <Container>
             <div className="login__box">
-              <div className="logo">
+              {/* <div className="logo">
                 <img src={logo} alt="logo" />
-              </div>
+              </div> */}
               <Card
                 className="login__content"
                 style={{
@@ -159,7 +157,7 @@ const Login: React.FC = () => {
 
                   <AvForm onValidSubmit={handleValidSubmit}>
                     <AvGroup>
-                      <Label for="username">username</Label>
+                      <Label for="username">Tên đăng nhập</Label>
                       <InputGroup>
                         <InputGroupAddon addonType="prepend">
                           <span className="input-group-text">
@@ -212,9 +210,9 @@ const Login: React.FC = () => {
                   </AvForm>
                 </CardBody>
               </Card>
-              <div className="slogan">
+              {/* <div className="slogan">
                 <img src={slogan} alt="logo" />
-              </div>
+              </div> */}
             </div>
           </Container>
         </div>

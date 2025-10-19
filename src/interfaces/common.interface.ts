@@ -54,3 +54,16 @@ export interface IBaseOptions {
   value?: string | number;
   label?: string;
 }
+
+export interface ISelectOption {
+  label: string;
+  value: number | string;
+  name: string;
+  id: number | string;
+}
+export interface ScopeFilter {
+  battalion_id?: number;
+  company_id?: number;
+  platoon_id?: number;
+  created_uid?: number;
+}

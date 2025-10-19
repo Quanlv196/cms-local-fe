@@ -9,6 +9,8 @@ import {
   changeActiveMenuFromLocation,
   setPending,
 } from "../redux/actions";
+import { useUser } from "../hooks/useUser";
+import { Role } from "../enums/common.enum";
 type IconType = FC<any>;
 const MenuItemWithChildren = ({
   role,
@@ -31,8 +33,7 @@ const MenuItemWithChildren = ({
       changeActiveMenuFromLocation && changeActiveMenuFromLocation("/");
     }
   };
-
-  console.log("activatedMenuItemIds", activatedMenuItemIds, item);
+  const user = useUser();
   useEffect(() => {
     setActiveMenu(activatedMenuItemIds.indexOf(item.id) >= 0 ? true : false);
     //set lại các child menu
@@ -169,8 +170,7 @@ const MenuItem = ({
 };
 
 const MenuItemLink = ({ item, access_token, className }: any) => {
-  const Icon = item.icon || null;
-
+  const { user } = useUser();
   if (item?.isRefLink) {
     return (
       <a
@@ -277,6 +277,7 @@ const AppMenu: React.FC<Props> = (props: Props) => {
       {props.menu && props.menu.menuItems && (
         <ul className="metismenu" id="menu-bar">
           {props.menu.menuItems.map((item: any, i: number) => {
+            if (item?.isAdmin && props?.user?.role !== Role.admin) return null;
             return (
               <React.Fragment key={item.id}>
                 {item.header && !isHorizontal && (

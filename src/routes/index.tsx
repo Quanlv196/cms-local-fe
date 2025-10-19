@@ -117,6 +117,7 @@ const UsersRouter = {
   pathParam: "/user/list",
   name: "Quản lý tài khoản",
   icon: FeatherIcon.Clipboard,
+  isAdmin: true,
   children: [
     {
       path: "/user/list",
@@ -191,6 +192,7 @@ const ConfigsRouter = {
   path: "/configs",
   pathParam: "/configs/list",
   name: "Cấu hình",
+  isAdmin: true,
   icon: FeatherIcon.Settings,
   children: [...BattalionRouter],
 };
