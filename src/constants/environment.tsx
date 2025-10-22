@@ -1,21 +1,22 @@
-let envBaseUrl: string = "https://dev.node.f99.com.vn/api";
-switch (process.env.REACT_APP_APP_MODE) {
+const appMode = process.env.REACT_APP_APP_MODE || "development";
+let envBaseUrl: string = "http://localhost:8080";
+switch (appMode) {
   case "development":
-    envBaseUrl = "http://localhost:8008";
+    envBaseUrl = process.env.REACT_BASE_URL_DEV || "http://localhost:8080";
     break;
   case "production":
-    envBaseUrl = "http://localhost:8008";
+    envBaseUrl = process.env.REACT_BASE_URL_PROD || "http://localhost:8080";
     break;
   default:
     break;
 }
-export const baseUrl = envBaseUrl;
+export const baseUrl = "http://192.168.1.109:8080";
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyDQOjibMhstB77NcYwVc2Ubs8pnKFNLNjw",
-  authDomain: "zs-bilet.firebaseapp.com",
-  projectId: "zs-bilet",
-  storageBucket: "zs-bilet.appspot.com",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
   messagingSenderId: "535258981652",
   appId: "1:535258981652:web:b620376ebd859d38a48e01",
   measurementId: "G-7316HLVKRN",
