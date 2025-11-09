@@ -1,3 +1,5 @@
+import ObjectType, { PositionType, RoleType } from "./app.enum";
+
 export const NATION_OPTIONS = [
   { value: "kinh", label: "Kinh" },
   { value: "tay", label: "Tày" },
@@ -53,75 +55,155 @@ export const NATION_OPTIONS = [
 ];
 
 export const REGILION_OPTIONS = [
+  { value: "phat_giao", label: "Phật giáo" },
   { value: "thien_chua_giao", label: "Thiên chúa giáo" },
   { value: "none", label: "Không" },
 ];
 export const STATUS_OPTIONS = [
-  { value: "1", label: "Hoạt động" },
-  { value: "0", label: "Ngưng" },
+  { value: "1", label: "Đang công tác" },
+  { value: "0", label: "Không còn công tác" },
 ];
 export const OBJECT_OPTIONS = [
-  { value: "sq", label: "Sĩ Quan" },
-  { value: "qncn", label: "Quân nhân chuyên nghiệp" },
-  { value: "hsq_bs", label: "Hạ sĩ quan" },
-  { value: "khac", label: "Khác" },
+  { value: ObjectType.SQ, label: "Sĩ Quan" },
+  { value: ObjectType.QNCN, label: "Quân nhân chuyên nghiệp" },
+  { value: ObjectType.HSQ_BS, label: "Hạ sĩ quan" },
+  { value: ObjectType.CS_MOI, label: "Chiến sĩ mới" },
 ];
 
 export const ROLE_OPTIONS = [
-  { value: "dai_tuong", label: "Đại tướng" },
-  { value: "thuong_tuong", label: "Thượng tướng" },
-  { value: "trung_tuong", label: "Trung tướng" },
-  { value: "thieu_tuong", label: "Thiếu tướng" },
-  { value: "dai_ta", label: "Đại tá" },
-  { value: "thuong_ta", label: "Thượng tá" },
-  { value: "trung_ta", label: "Trung tá" },
-  { value: "thieu_ta", label: "Thiếu tá" },
-  { value: "dai_uy", label: "Đại úy" },
-  { value: "thuong_uy", label: "Thượng úy" },
-  { value: "trung_uy", label: "Trung úy" },
-  { value: "thieu_uy", label: "Thiếu úy" },
+  { value: RoleType.DAI_TUONG, label: "Đại tướng" },
+  { value: RoleType.THUONG_TUONG, label: "Thượng tướng" },
+  { value: RoleType.TRUNG_TUONG, label: "Trung tướng" },
+  { value: RoleType.THIEU_TUONG, label: "Thiếu tướng" },
+  { value: RoleType.DAI_TA, label: "Đại tá" },
+  { value: RoleType.THUONG_TA, label: "Thượng tá" },
+  { value: RoleType.TRUNG_TA, label: "Trung tá" },
+  { value: RoleType.THIEU_TA, label: "Thiếu tá" },
+  { value: RoleType.DAI_UY, label: "Đại úy" },
+  { value: RoleType.THUONG_UY, label: "Thượng úy" },
+  { value: RoleType.TRUNG_UY, label: "Trung úy" },
+  { value: RoleType.THIEU_UY, label: "Thiếu úy" },
+  { value: RoleType.BINH_NHI, label: "Binh nhì" },
+  { value: RoleType.BINH_NHAT, label: "Binh nhất" },
+  { value: RoleType.HA_SI, label: "Hạ sĩ" },
+  { value: RoleType.TRUNG_SI, label: "Trung sĩ" },
+  { value: RoleType.THUONG_SI, label: "Thượng sĩ" },
 ];
 
 export const POSITION_OPTIONS = [
-  // Cấp Trung đội
-  { value: "trung_doi_truong", label: "Trung đội trưởng" },
-  { value: "trung_doi_pho", label: "Trung đội phó" },
+  // CẤP LỮ ĐOÀN
+  { value: PositionType.LU_DOAN_TRUONG, label: "Lữ đoàn trưởng" },
+  { value: PositionType.CHINH_UY_LU_DOAN, label: "Chính ủy Lữ đoàn" },
+  {
+    value: PositionType.PHO_LU_DOAN_TRUONG_THAM_MUU_TRUONG,
+    label: "Phó Lữ đoàn trưởng kiêm Tham mưu trưởng",
+  },
+  { value: PositionType.PHO_LU_DOAN_TRUONG, label: "Phó Lữ đoàn trưởng" },
+  { value: PositionType.PHO_CHINH_UY_LU_DOAN, label: "Phó Chính ủy Lữ đoàn" },
 
-  // Cấp Đại đội
-  { value: "dai_doi_truong", label: "Đại đội trưởng" },
-  { value: "dai_doi_pho", label: "Đại đội phó" },
+  // PHÒNG THAM MƯU
+  { value: PositionType.THAM_MUU_TRUONG, label: "Tham mưu trưởng" },
+  { value: PositionType.PHO_THAM_MUU_TRUONG, label: "Phó Tham mưu trưởng" },
 
-  // Cấp Tiểu đoàn
-  { value: "tieu_doan_truong", label: "Tiểu đoàn trưởng" },
-  { value: "tieu_doan_pho", label: "Tiểu đoàn phó" },
+  // PHÒNG CHÍNH TRỊ
+  { value: PositionType.CHU_NHIEM_CHINH_TRI, label: "Chủ nhiệm Chính trị" },
+  {
+    value: PositionType.PHO_CHU_NHIEM_CHINH_TRI,
+    label: "Phó Chủ nhiệm Chính trị",
+  },
 
-  // Cấp Trung đoàn
-  { value: "trung_doan_truong", label: "Trung đoàn trưởng" },
-  { value: "trung_doan_pho", label: "Trung đoàn phó" },
+  // PHÒNG HẬU CẦN KỸ THUẬT
+  {
+    value: PositionType.CHU_NHIEM_HAU_CAN_KY_THUAT,
+    label: "Chủ nhiệm Hậu cần Kỹ thuật",
+  },
+  {
+    value: PositionType.PHO_CHU_NHIEM_HAU_CAN_KY_THUAT,
+    label: "Phó Chủ nhiệm Hậu cần Kỹ thuật",
+  },
 
-  // Cấp Lữ đoàn
-  { value: "lu_doan_truong", label: "Lữ đoàn trưởng" },
-  { value: "lu_doan_pho", label: "Lữ đoàn phó" },
+  // CẤP TIỂU ĐOÀN
+  { value: PositionType.TIEU_DOAN_TRUONG, label: "Tiểu đoàn trưởng" },
+  {
+    value: PositionType.CHINH_TRI_VIEN_TIEU_DOAN,
+    label: "Chính trị viên Tiểu đoàn",
+  },
+  { value: PositionType.PHO_TIEU_DOAN_TRUONG, label: "Phó Tiểu đoàn trưởng" },
+  {
+    value: PositionType.CHINH_TRI_VIEN_PHO_TIEU_DOAN,
+    label: "Chính trị viên Phó Tiểu đoàn",
+  },
 
-  // Cấp Sư đoàn
-  { value: "su_doan_truong", label: "Sư đoàn trưởng" },
-  { value: "su_doan_pho", label: "Sư đoàn phó" },
+  // CẤP ĐẠI ĐỘI
+  { value: PositionType.DAI_DOI_TRUONG, label: "Đại đội trưởng" },
+  {
+    value: PositionType.CHINH_TRI_VIEN_DAI_DOI,
+    label: "Chính trị viên Đại đội",
+  },
+  { value: PositionType.PHO_DAI_DOI_TRUONG, label: "Phó Đại đội trưởng" },
+  {
+    value: PositionType.CHINH_TRI_VIEN_PHO_DAI_DOI,
+    label: "Chính trị viên Phó Đại đội",
+  },
 
-  // Cấp Quân khu / Quân đoàn
-  { value: "quan_doan_truong", label: "Quân đoàn trưởng" },
-  { value: "quan_doan_pho", label: "Quân đoàn phó" },
-  { value: "quan_khu_truong", label: "Quân khu trưởng" },
-  { value: "quan_khu_pho", label: "Quân khu phó" },
-
-  // Khác
-  { value: "tong_tu_lenh", label: "Tổng tư lệnh" },
-  { value: "chinh_uy", label: "Chính ủy" },
-  { value: "chinh_tri_vien", label: "Chính trị viên" },
+  // CẤP TRUNG ĐỘI
+  { value: PositionType.TRUNG_DOI_TRUONG, label: "Trung đội trưởng" },
 ];
 
 export const MISSION_COMPLETE_OPTIONS = [
-  { value: "hoan_thanh_xuat_sac", label: "Hoàn thành xuất sắc" },
-  { value: "hoan_thanh_tot", label: "Hoàn thành tốt" },
-  { value: "hoan_thanh", label: "Hoàn thành" },
-  { value: "khong_hoan_thanh", label: "Không hoàn thành" },
+  { value: "hoan_thanh_xuat_sac", label: "Hoàn thành xuất sắc nhiệm vụ" },
+  { value: "hoan_thanh_tot", label: "Hoàn thành tốt nhiệm vụ" },
+  { value: "hoan_thanh", label: "Hoàn thành nhiệm vụ" },
+  { value: "khong_hoan_thanh", label: "Không hoàn thành nhiệm vụ" },
+];
+
+export const RoleByObjectTypeLabel: Record<
+  ObjectType,
+  { value: RoleType; label: string }[]
+> = {
+  [ObjectType.SQ]: [
+    { value: RoleType.DAI_TA, label: "Đại tá" },
+    { value: RoleType.THUONG_TA, label: "Thượng tá" },
+    { value: RoleType.TRUNG_TA, label: "Trung tá" },
+    { value: RoleType.THIEU_TA, label: "Thiếu tá" },
+    { value: RoleType.DAI_UY, label: "Đại úy" },
+    { value: RoleType.THUONG_UY, label: "Thượng úy" },
+    { value: RoleType.TRUNG_UY, label: "Trung úy" },
+    { value: RoleType.THIEU_UY, label: "Thiếu úy" },
+  ],
+  [ObjectType.QNCN]: [
+    { value: RoleType.THUONG_TA, label: "Thượng tá" },
+    { value: RoleType.TRUNG_TA, label: "Trung tá" },
+    { value: RoleType.THIEU_TA, label: "Thiếu tá" },
+    { value: RoleType.DAI_UY, label: "Đại úy" },
+    { value: RoleType.THUONG_UY, label: "Thượng úy" },
+    { value: RoleType.TRUNG_UY, label: "Trung úy" },
+    { value: RoleType.THIEU_UY, label: "Thiếu úy" },
+  ],
+  [ObjectType.HSQ_BS]: [
+    { value: RoleType.BINH_NHI, label: "Binh nhì" },
+    { value: RoleType.BINH_NHAT, label: "Binh nhất" },
+    { value: RoleType.HA_SI, label: "Hạ sĩ" },
+    { value: RoleType.TRUNG_SI, label: "Trung sĩ" },
+    { value: RoleType.THUONG_SI, label: "Thượng sĩ" },
+  ],
+  [ObjectType.CS_MOI]: [{ value: RoleType.BINH_NHI, label: "Binh nhì" }],
+};
+
+export const SCHOOL_OPTIONS = [
+  { value: 1, label: "Sĩ quan Phòng hoá" },
+  { value: 2, label: "Sĩ quan Chính trị" },
+  { value: 3, label: "Sĩ quan Lục quân" },
+  { value: 4, label: "Sĩ quan Thông tin" },
+  { value: 5, label: "Học viện Hậu cần" },
+  { value: 6, label: "Học viện Kỹ thuật" },
+  { value: 7, label: "Học viện Quân y" },
+  { value: 8, label: "Trường ngoài quân đội" },
+];
+
+export const CARE_OPTIONS = [
+  { value: 1, label: "Hoàn cảnh gia đình" },
+  { value: 2, label: "Tư tưởng" },
+  { value: 3, label: "Sức khoẻ" },
+  { value: 4, label: "Quan hệ xã hội" },
 ];

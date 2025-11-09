@@ -75,7 +75,7 @@ const InputTitleTop = (props: rootProps) => {
 
   return (
     <Editor
-      //   editorState={editorState}
+      editorState={editorState}
       wrapperClassName="demo-wrapper"
       editorClassName="demo-editor"
       onEditorStateChange={(value: any) => {

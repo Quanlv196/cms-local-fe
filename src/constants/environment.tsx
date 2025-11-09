@@ -10,7 +10,7 @@ switch (appMode) {
   default:
     break;
 }
-export const baseUrl = "http://192.168.1.109:8080";
+export const baseUrl = "http://localhost:8008";
 
 export const firebaseConfig = {
   apiKey: "",

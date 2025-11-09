@@ -11,20 +11,24 @@ import Loader from "../../components/Loader";
 import PageBody from "../../components/PageBody";
 import { DebounceSelect } from "../../common/DebounceSelect";
 import {
-  MISSION_COMPLETE_OPTIONS,
+  CARE_OPTIONS,
   NATION_OPTIONS,
   OBJECT_OPTIONS,
   POSITION_OPTIONS,
   REGILION_OPTIONS,
-  ROLE_OPTIONS,
+  RoleByObjectTypeLabel,
+  SCHOOL_OPTIONS,
 } from "../../constants/app.constant";
 import { Battalion } from "../configs/battalion/BattalionList";
 import { Company } from "../configs/company/CompanyList";
 import { Platoon } from "../configs/platoon/PlatoonList";
 import EditorComponent from "../../common/EditorComponent";
-import { isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import DataUtils from "../../helpers/DataUtils";
 import moment from "moment";
+import ObjectType from "../../constants/app.enum";
+import { FileUploader } from "react-drag-drop-files";
+import { getBase64, getURLImage, uploadFile } from "../../helpers/UploadUtils";
 
 interface Props {
   history: any;
@@ -171,6 +175,7 @@ const ContentPage = (props: any) => {
   const [loading, setLoading] = useState(false);
   const router = useHistory();
   const formRef = useRef<any>(null);
+  const [imgAvatar, setImgAvatar] = useState<any>(null);
 
   const handleChangeInput = (event?: any) => {
     let { value, name } = event.target;
@@ -187,9 +192,35 @@ const ContentPage = (props: any) => {
     const params = DataUtils.formatDataForAPI({
       ...data,
       birthday: moment(data?.birthday).valueOf(),
-      position_time: moment(data?.position_time).valueOf(),
-      role_time: moment(data?.role_time).valueOf(),
+      position_time: data?.position_time
+        ? moment(data?.position_time).valueOf()
+        : undefined,
+      role_time: data?.role_time
+        ? moment(data?.role_time).valueOf()
+        : undefined,
+      join_party_date: data?.join_party_date
+        ? moment(data?.join_party_date).valueOf()
+        : undefined,
+      join_union_date: data?.join_union_date
+        ? moment(data?.join_union_date).valueOf()
+        : undefined,
     });
+    const fields = ["excellent_year", "good_year", "success_year", "fail_year"];
+
+    fields.forEach((field) => {
+      if (params?.[field] === "<p></p>" || params?.[field] === "<p></p>\n") {
+        params[field] = null;
+      }
+    });
+    if (!!imgAvatar) {
+      const url_avatar: any = await uploadFile(imgAvatar);
+      if (url_avatar) {
+        params.image = url_avatar;
+      } else {
+        toast.error("Không thể tải ảnh lên ảnh đại diện");
+        return false;
+      }
+    }
     setLoading(true);
     let response: any = await APIClient.POST(URL, params);
     setLoading(false);
@@ -207,8 +238,34 @@ const ContentPage = (props: any) => {
     const params = DataUtils.formatDataForAPI({
       ...data,
       birthday: moment(data?.birthday).valueOf(),
-      position_time: moment(data?.position_time).valueOf(),
-      role_time: moment(data?.role_time).valueOf(),
+      position_time: data?.position_time
+        ? moment(data?.position_time).valueOf()
+        : undefined,
+      role_time: data?.role_time
+        ? moment(data?.role_time).valueOf()
+        : undefined,
+      join_party_date: data?.join_party_date
+        ? moment(data?.join_party_date).valueOf()
+        : undefined,
+      join_union_date: data?.join_union_date
+        ? moment(data?.join_union_date).valueOf()
+        : undefined,
+    });
+    if (!!imgAvatar) {
+      const url_avatar: any = await uploadFile(imgAvatar);
+      if (url_avatar) {
+        params.image = url_avatar;
+      } else {
+        toast.error("Không thể tải ảnh lên ảnh đại diện");
+        return false;
+      }
+    }
+    const fields = ["excellent_year", "good_year", "success_year", "fail_year"];
+
+    fields.forEach((field) => {
+      if (params?.[field] === "<p></p>" || params?.[field] === "<p></p>\n") {
+        params[field] = null;
+      }
     });
     setLoading(true);
     delete params?.code;
@@ -227,7 +284,20 @@ const ContentPage = (props: any) => {
     }
   };
 
-  console.log("dataxxx", data?.role_time, moment(data?.role_time));
+  const handleChangeFile = async (file: any, type: string) => {
+    setLoading(true);
+    const imgBase64: any = await getBase64(file);
+    setLoading(false);
+    if (imgBase64) {
+      setData({
+        ...data,
+        [type]: imgBase64,
+      });
+    }
+    setImgAvatar(file);
+  };
+
+  console.log("dataxx", data);
 
   return (
     <div className="detail__page" style={{ margin: 20 }}>
@@ -246,28 +316,70 @@ const ContentPage = (props: any) => {
           { name: "company_id", value: data.company_id },
           { name: "current_residence", value: data.current_residence },
           { name: "home_town", value: data.home_town },
-          { name: "mission_result", value: data.mission_result },
           { name: "platoon_id", value: data.platoon_id },
           { name: "battalion_id", value: data.battalion_id },
           { name: "position", value: data.position },
-          {
-            name: "position_time",
-            value: data.position_time ? moment(data.position_time) : null,
-          },
           { name: "object", value: data.object },
           { name: "nation", value: data.nation },
           { name: "religion", value: data.religion },
           { name: "role", value: data.role },
-          {
-            name: "role_time",
-            value: data.role_time ? moment(data.role_time) : null,
-          },
         ]}
       >
         <Row gutter={[20, 20]}>
           <Col xxl={18} md={16}>
             <PageBody className="m-0">
               <h3>Thông tin cơ bản</h3>
+              <Row>
+                <Col>
+                  <Form.Item label="Ảnh quân nhân">
+                    <div className="mb-2">
+                      {data.image && (
+                        <div className="book__image mt-3">
+                          <img src={getURLImage(data.image)} alt="Ảnh cover" />
+                          <div
+                            className="icon_delete"
+                            onClick={() => {
+                              setData({ ...data, image: null });
+                              setImgAvatar(null);
+                            }}
+                          >
+                            <i className="uil-trash-alt"></i>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <FileUploader
+                      handleChange={(e: any) => {
+                        handleChangeFile(e, "image");
+                        setImgAvatar(null);
+                      }}
+                      fileOrFiles={imgAvatar}
+                      multiple={false}
+                      name="image"
+                      types={["JPEG", "JPG", "PNG"]}
+                      classes="file-drop-inner upload__file"
+                    >
+                      <div>
+                        {!data.image ? (
+                          <Button
+                            color="primary"
+                            className="bilet_button outline"
+                          >
+                            <i className="uil-upload"></i> Tải lên ảnh
+                          </Button>
+                        ) : (
+                          <Button
+                            color="primary"
+                            className="bilet_button outline"
+                          >
+                            <i className="uil-refresh"></i> Thay đổi ảnh
+                          </Button>
+                        )}
+                      </div>
+                    </FileUploader>
+                  </Form.Item>
+                </Col>
+              </Row>
               <Row gutter={[20, 0]} align="middle">
                 <Col md={12} xs={24}>
                   <Form.Item
@@ -391,10 +503,24 @@ const ContentPage = (props: any) => {
                     />
                   </Form.Item>
                 </Col>
+                <Col md={24} xs={24}>
+                  <Form.Item label="Trường đào tạo">
+                    <DebounceSelect
+                      labelInValue={false}
+                      value={data?.school}
+                      placeholder="Tìm kiếm"
+                      onChange={(dt: any) => {
+                        setData({
+                          ...data,
+                          school: dt,
+                        });
+                      }}
+                      style={{ width: "100%" }}
+                      optionDefault={SCHOOL_OPTIONS}
+                    />
+                  </Form.Item>
+                </Col>
               </Row>
-            </PageBody>
-            <PageBody className="m-0">
-              <h3>Thông tin cấp bậc</h3>
               <Row gutter={[20, 0]} align="middle">
                 <Col md={24} xs={24}>
                   <Form.Item
@@ -426,9 +552,14 @@ const ContentPage = (props: any) => {
                     rules={[{ required: true, message: "Cấp bậc là bắt buộc" }]}
                   >
                     <DebounceSelect
+                      disabled={isEmpty(data?.object)}
                       value={data?.role}
                       labelInValue={false}
-                      placeholder="Tìm kiếm"
+                      placeholder={
+                        isEmpty(data?.object)
+                          ? "Vui lòng chọn đối tượng trước"
+                          : "Chọn cấp bậc"
+                      }
                       onChange={(dt: any) => {
                         setData({
                           ...data,
@@ -436,24 +567,18 @@ const ContentPage = (props: any) => {
                         });
                       }}
                       style={{ width: "100%" }}
-                      optionDefault={ROLE_OPTIONS}
+                      optionDefault={
+                        RoleByObjectTypeLabel?.[data?.object as ObjectType] ||
+                        []
+                      }
                     />
                   </Form.Item>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Form.Item
-                    label="Thời gian lên cấp"
-                    name="role_time"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Thời gian lên cấp là bắt buộc",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Thời gian phong/thăng quân hàm">
                     <DatePicker
                       picker="month"
-                      value={data?.role_time ?? null}
+                      value={data?.role_time ? moment(data?.role_time) : null}
                       format={"MM/YYYY"}
                       disabledDate={(current) =>
                         current && current.year() > new Date().getFullYear()
@@ -490,19 +615,12 @@ const ContentPage = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Form.Item
-                    label="Thời gian lên chức"
-                    name="position_time"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Thời gian lên cấp là bắt buộc",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Thời gian bổ nhiệm">
                     <DatePicker
                       picker="month"
-                      value={data?.position_time}
+                      value={
+                        data?.position_time ? moment(data?.position_time) : null
+                      }
                       format={"MM/YYYY"}
                       disabledDate={(current) =>
                         current && current.year() > new Date().getFullYear()
@@ -514,6 +632,102 @@ const ContentPage = (props: any) => {
                         });
                       }}
                       placeholder="Chọn tháng/năm"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={[20, 0]} align="middle">
+                <Col md={12} xs={24}>
+                  <Form.Item label="Ngày vào Đoàn">
+                    <DatePicker
+                      value={
+                        data?.join_union_date
+                          ? moment(data?.join_union_date)
+                          : null
+                      }
+                      format={"DD/MM/YYYY"}
+                      disabledDate={(current) =>
+                        current && current > moment().endOf("day")
+                      }
+                      onChange={(value) => {
+                        setData({
+                          ...data,
+                          join_union_date: value,
+                        });
+                      }}
+                      placeholder="Chọn ngày"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col md={12} xs={24}>
+                  <Form.Item label="Ngày vào Đảng">
+                    <DatePicker
+                      value={
+                        data?.join_party_date
+                          ? moment(data?.data?.join_party_date)
+                          : null
+                      }
+                      format={"DD/MM/YYYY"}
+                      disabledDate={(current) =>
+                        current && current > moment().endOf("day")
+                      }
+                      onChange={(value) => {
+                        setData({
+                          ...data,
+                          join_party_date: value,
+                        });
+                      }}
+                      placeholder="Chọn ngày"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={[20, 0]} align="middle">
+                <Col xxl={6} md={12}>
+                  <Form.Item label="Năm không hoàn thành nhiệm vụ">
+                    <EditorComponent
+                      type="text"
+                      rows={2}
+                      onChange={(e: any) => handleChangeInput(e)}
+                      value={data?.fail_year}
+                      name="fail_year"
+                      placeholder="Nhập nội dung"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xxl={6} md={12}>
+                  <Form.Item label="Năm hoàn thành nhiệm vụ">
+                    <EditorComponent
+                      type="text"
+                      rows={2}
+                      onChange={(e: any) => handleChangeInput(e)}
+                      value={data?.success_year}
+                      name="success_year"
+                      placeholder="Nhập nội dung"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xxl={6} md={12}>
+                  <Form.Item label="Năm hoàn thành tốt nhiệm vụ">
+                    <EditorComponent
+                      type="text"
+                      rows={2}
+                      onChange={(e: any) => handleChangeInput(e)}
+                      value={data?.good_year}
+                      name="good_year"
+                      placeholder="Nhập nội dung"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xxl={6} md={12}>
+                  <Form.Item label="Năm hoàn thành xuất sắc nhiệm vụ">
+                    <EditorComponent
+                      type="text"
+                      rows={2}
+                      onChange={(e: any) => handleChangeInput(e)}
+                      value={data?.excellent_year}
+                      name="excellent_year"
+                      placeholder="Nhập nội dung"
                     />
                   </Form.Item>
                 </Col>
@@ -559,32 +773,6 @@ const ContentPage = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col md={24} xs={24}>
-                  <Form.Item
-                    label="Kết quả hoàn thành nhiệm vụ"
-                    name="mission_result"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Kết quả hoàn thành nhiệm vụ là bắt buộc",
-                      },
-                    ]}
-                  >
-                    <DebounceSelect
-                      value={data?.mission_result}
-                      labelInValue={false}
-                      placeholder="Tìm kiếm"
-                      onChange={(dt: any) => {
-                        setData({
-                          ...data,
-                          mission_result: dt,
-                        });
-                      }}
-                      style={{ width: "100%" }}
-                      optionDefault={MISSION_COMPLETE_OPTIONS}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col md={24} xs={24}>
                   <Form.Item label="Thông tin về gia đình quân nhân">
                     <EditorComponent
                       type="text"
@@ -608,18 +796,41 @@ const ContentPage = (props: any) => {
                     />
                   </Form.Item>
                 </Col>
-                <Col md={24} xs={24}>
+                <Col md={12} xs={24}>
                   <Form.Item label="" className="m-0">
                     <Checkbox
                       checked={data?.is_care}
                       onChange={(event: any) =>
-                        setData({ ...data, is_care: event?.target?.checked })
+                        setData({
+                          ...data,
+                          is_care: event?.target?.checked,
+                          care_infomation: undefined,
+                        })
                       }
                     >
                       Đánh dấu cần được quan tâm
                     </Checkbox>
                   </Form.Item>
                 </Col>
+                {data?.is_care && (
+                  <Col md={12} xs={24}>
+                    <Form.Item label="Vấn đề cần quan tâm">
+                      <DebounceSelect
+                        labelInValue={false}
+                        value={data?.care_infomation}
+                        placeholder="Chọn vấn đề"
+                        onChange={(dt: any) => {
+                          setData({
+                            ...data,
+                            care_infomation: dt,
+                          });
+                        }}
+                        style={{ width: "100%" }}
+                        optionDefault={CARE_OPTIONS}
+                      />
+                    </Form.Item>
+                  </Col>
+                )}
               </Row>
             </PageBody>
           </Col>

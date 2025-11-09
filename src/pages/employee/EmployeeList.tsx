@@ -22,12 +22,14 @@ import Loader from "../../components/Loader";
 import RowEmpty from "../../components/RowEmpty";
 import moment from "moment";
 import {
+  CARE_OPTIONS,
   MISSION_COMPLETE_OPTIONS,
   NATION_OPTIONS,
   OBJECT_OPTIONS,
   POSITION_OPTIONS,
   REGILION_OPTIONS,
   ROLE_OPTIONS,
+  SCHOOL_OPTIONS,
   STATUS_OPTIONS,
 } from "../../constants/app.constant";
 import { Employee } from "../../interfaces/employee.interface";
@@ -584,11 +586,75 @@ const DataFilter = (props: any) => {
             <Checkbox
               checked={filter?.is_care}
               onChange={(event: any) =>
-                setFilter({ ...filter, is_care: event?.target?.checked })
+                setFilter({
+                  ...filter,
+                  is_care: event?.target?.checked ? true : undefined,
+                  care_infomation: undefined,
+                })
               }
             >
               Các quân nhân cần quan tâm
             </Checkbox>
+          </Form.Item>
+          {filter?.is_care && (
+            <Form.Item label="Vấn đề cần quan tâm">
+              <DebounceSelect
+                labelInValue={false}
+                value={filter?.care_infomation}
+                placeholder="Chọn vấn đề"
+                allowClear
+                onChange={(dt: any) => {
+                  setFilter({
+                    ...filter,
+                    care_infomation: dt,
+                  });
+                }}
+                style={{ width: "100%" }}
+                optionDefault={CARE_OPTIONS}
+              />
+            </Form.Item>
+          )}
+          <Form.Item label="" className="m-0">
+            <Checkbox
+              checked={filter?.is_union}
+              onChange={(event: any) =>
+                setFilter({
+                  ...filter,
+                  is_union: event?.target?.checked ? true : undefined,
+                })
+              }
+            >
+              Là Đoàn viên
+            </Checkbox>
+          </Form.Item>
+          <Form.Item label="" className="m-0">
+            <Checkbox
+              checked={filter?.is_party}
+              onChange={(event: any) =>
+                setFilter({
+                  ...filter,
+                  is_party: event?.target?.checked ? true : undefined,
+                })
+              }
+            >
+              Là Đảng viên
+            </Checkbox>
+          </Form.Item>
+          <Form.Item label="Trường đào tạo">
+            <DebounceSelect
+              labelInValue={false}
+              value={filter?.school}
+              placeholder="Chọn trường"
+              allowClear
+              onChange={(dt: any) => {
+                setFilter({
+                  ...filter,
+                  school: dt,
+                });
+              }}
+              style={{ width: "100%" }}
+              optionDefault={SCHOOL_OPTIONS}
+            />
           </Form.Item>
         </Form>
       </Drawer>
