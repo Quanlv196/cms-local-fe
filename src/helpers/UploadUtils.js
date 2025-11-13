@@ -137,5 +137,7 @@ export const blobToBase64 = async (blob) => {
 
 export const getURLImage = (url) => {
   if (!url) return;
+  if (url?.startsWith("data:image")) return url;
   return `${baseUrl}${url}`;
 };
+

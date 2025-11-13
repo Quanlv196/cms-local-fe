@@ -31,4 +31,14 @@ export interface Employee {
   issues_of_concern?: string;
   is_care?: boolean;
   status?: number;
+  excellent_year?: string;
+  good_year?: string;
+  success_year?: string;
+  fail_year?: string;
+  school?: number;
+  join_union_date?: string;
+  join_party_date?: string;
+  image?: string;
+  care_infomation?: number;
 }
+

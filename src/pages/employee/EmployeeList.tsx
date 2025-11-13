@@ -33,7 +33,7 @@ import {
   STATUS_OPTIONS,
 } from "../../constants/app.constant";
 import { Employee } from "../../interfaces/employee.interface";
-import { Filter, Trash2 } from "react-feather";
+import { Download, Filter, Trash2 } from "react-feather";
 import { DebounceSelect } from "../../common/DebounceSelect";
 import { Battalion } from "../configs/battalion/BattalionList";
 import { Company } from "../configs/company/CompanyList";
@@ -133,8 +133,6 @@ const List: React.FC<Props> = (props: any) => {
     }
   };
 
-  console.log("filterxx", filter);
-
   const setFilterParams = (params: any) => {
     var filterParams = "";
     Object.keys(params).map(function (item, i) {
@@ -154,7 +152,6 @@ const List: React.FC<Props> = (props: any) => {
       limit: limit,
       ...filter,
     };
-    // Xóa các key có giá trị null, undefined, hoặc chuỗi rỗng
     Object.keys(params).forEach((key) => {
       if (
         params[key] === null ||
@@ -185,13 +182,72 @@ const List: React.FC<Props> = (props: any) => {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const params: any = {
+        ...filter,
+      };
+
+      // 🔹 Xoá param rỗng/null
+      Object.keys(params).forEach((key) => {
+        if (
+          params[key] === null ||
+          params[key] === undefined ||
+          params[key] === ""
+        ) {
+          delete params[key];
+        }
+      });
+
+      setLoading(true);
+
+      const URL = `${baseUrl}/employee/export-excel`;
+
+      const result: any = await APIClient.DOWNLOAD(URL, params);
+
+      setLoading(false);
+
+      if (result?.error) {
+        toast.error(
+          result.error.error_description || "Đã xảy ra lỗi khi xuất file!"
+        );
+        return;
+      }
+
+      // 🔹 result.response chính là Blob khi download
+      const blob = result.response;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `employees_${new Date().getTime()}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Xuất file Excel thành công!");
+    } catch (err) {
+      setLoading(false);
+      console.error("Export error:", err);
+      toast.error("Đã xảy ra lỗi khi xuất file!");
+    }
+  };
+
   return (
     <React.Fragment>
       <PageTitle
         title="Quản lý Quân nhân"
         breadCrumbItems={[{ label: "Quản lý quân nhân", active: true }]}
         rightContent={
-          <div className="group__button  ">
+          <div className="group__button d-flex" style={{ gap: 10 }}>
+            <Button
+              color="primary"
+              onClick={handleExport}
+              className="bilet_button outline d-flex align-items-center"
+              style={{ gap: 5 }}
+            >
+              <Download size={18} /> Xuất dữ liệu
+            </Button>
             <Button
               color="primary"
               onClick={() => router?.push("/employee/add")}
@@ -569,13 +625,13 @@ const DataFilter = (props: any) => {
           <Form.Item label="Mức độ hoàn thành NV">
             <DebounceSelect
               labelInValue={false}
-              value={filter?.mission_result}
+              value={filter?.mission_completion_type}
               placeholder="Chọn mức độ"
               allowClear
               onChange={(dt: any) => {
                 setFilter({
                   ...filter,
-                  mission_result: dt,
+                  mission_completion_type: dt,
                 });
               }}
               style={{ width: "100%" }}
@@ -670,9 +726,11 @@ const DataTableList = (props: any) => {
   const getLabelStatus = (status: any) => {
     switch (status) {
       case 0:
-        return <span className="label__status warning">Ngưng</span>;
+        return (
+          <span className="label__status warning">Không còn công tác</span>
+        );
       case 1:
-        return <span className="label__status success">Hoạt động</span>;
+        return <span className="label__status success">Đang công tác</span>;
       default: {
         return "---";
       }
@@ -704,8 +762,11 @@ const DataTableList = (props: any) => {
           <th style={{ minWidth: 300 }}>Đơn vị</th>
           <th style={{ minWidth: 100 }}>Dân tộc</th>
           <th style={{ minWidth: 150 }}>Tôn giáo</th>
-          <th style={{ minWidth: 200 }}>Kết quả hoàn thành NV</th>
+          <th style={{ minWidth: 150 }}>Ngày vào đoàn</th>
+          <th style={{ minWidth: 150 }}>Ngày vào đảng</th>
+          <th style={{ minWidth: 150 }}>Trường đào tạo</th>
           <th style={{ minWidth: 150 }}>Cần quan tâm?</th>
+          <th style={{ minWidth: 150 }}>Vấn đề cần quan tâm</th>
           <th style={{ minWidth: 100 }}>Trạng thái</th>
           <th
             style={{
@@ -736,7 +797,7 @@ const DataTableList = (props: any) => {
       <tbody>
         {data &&
           data.map((item: Employee, index: number) => (
-            <tr>
+            <tr key={item?.id}>
               <td>{start + index + 1}</td>
               <td
                 style={{
@@ -761,14 +822,22 @@ const DataTableList = (props: any) => {
                   {ROLE_OPTIONS?.find((e) => e?.value === item?.role)?.label ||
                     "---"}
                 </div>
-                <div>{moment(item?.role_time).format("MM/YYYY")}</div>
+                <div>
+                  {item?.role_time
+                    ? moment(item?.role_time).format("MM/YYYY")
+                    : "--"}
+                </div>
               </td>
               <td>
                 <div>
                   {POSITION_OPTIONS?.find((e) => e?.value === item?.position)
                     ?.label || "---"}
                 </div>
-                <div>{moment(item?.position_time).format("MM/YYYY")}</div>
+                <div>
+                  {item?.position_time
+                    ? moment(item?.position_time).format("MM/YYYY")
+                    : "--"}
+                </div>
               </td>
               <td>{`${item?.platoon?.name}/${item?.company?.name}/${item?.battalion?.name}`}</td>
               <td>
@@ -780,12 +849,26 @@ const DataTableList = (props: any) => {
                   ?.label || "---"}
               </td>
               <td>
-                {MISSION_COMPLETE_OPTIONS?.find(
-                  (e) => e?.value === item?.mission_result
-                )?.label || "---"}
+                {item?.join_union_date
+                  ? moment(item?.join_union_date).format("DD/MM/YYYY")
+                  : "--"}
+              </td>
+              <td>
+                {item?.join_party_date
+                  ? moment(item?.join_party_date).format("DD/MM/YYYY")
+                  : "--"}
+              </td>
+              <td>
+                {SCHOOL_OPTIONS?.find((e) => e?.value === item?.care_infomation)
+                  ?.label || "---"}
               </td>
               <td>{item?.is_care && "Cần quan tâm"}</td>
+              <td>
+                {CARE_OPTIONS?.find((e) => e?.value === item?.care_infomation)
+                  ?.label || "---"}
+              </td>
               <td>{getLabelStatus(item?.status)}</td>
+
               <td
                 style={{
                   minWidth: 60,
@@ -901,3 +984,4 @@ const RenderActionModal = (props: any) => {
 };
 
 export default List;
+

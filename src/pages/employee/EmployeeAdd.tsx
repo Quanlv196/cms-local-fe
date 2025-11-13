@@ -29,6 +29,7 @@ import moment from "moment";
 import ObjectType from "../../constants/app.enum";
 import { FileUploader } from "react-drag-drop-files";
 import { getBase64, getURLImage, uploadFile } from "../../helpers/UploadUtils";
+import NotFound from "../dashboard/NotFound";
 
 interface Props {
   history: any;
@@ -38,7 +39,6 @@ interface Props {
 }
 
 const List: React.FC<Props> = (props: any) => {
-  const router = useHistory();
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState(props.match.params.id);
   const [data, setData] = useState<any>({});
@@ -48,6 +48,7 @@ const List: React.FC<Props> = (props: any) => {
   const [battalion, setBattalion] = useState<Battalion[]>([]);
   const [company, setCompany] = useState<Company[]>([]);
   const [platoon, setPlatoon] = useState<Platoon[]>([]);
+  const [isNotFound, setIsNotFound] = useState(false);
 
   useEffect(() => {
     if (id && id !== "add") {
@@ -112,6 +113,7 @@ const List: React.FC<Props> = (props: any) => {
     setLoading(false);
     if (response.error !== undefined) {
       toast.error(response.error.error_description);
+      setIsNotFound(true);
     } else if (response.response !== undefined) {
       const resData = response.response;
       setData({
@@ -124,6 +126,10 @@ const List: React.FC<Props> = (props: any) => {
       fetchPlatoon("", resData?.company?.id);
     }
   };
+
+  if (isNotFound) {
+    return <NotFound />;
+  }
 
   return (
     <React.Fragment>
@@ -538,6 +544,7 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           object: dt,
+                          role: null,
                         });
                       }}
                       style={{ width: "100%" }}
@@ -1016,3 +1023,4 @@ const RenderActionModal = (props: any) => {
 };
 
 export default List;
+

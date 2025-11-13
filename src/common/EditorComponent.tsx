@@ -84,8 +84,16 @@ const InputTitleTop = (props: rootProps) => {
       placeholder="Nhập nội dung"
       readOnly={disabled || false}
       wrapperStyle={{ opacity: disabled ? ".5" : 1 }}
+      toolbar={{
+        options: ["inline", "list", "link", "history"],
+        inline: { options: ["bold", "italic", "underline", "strikethrough"] },
+        list: { options: ["unordered", "ordered"] },
+        link: { options: ["link"] },
+        history: { options: [] },
+      }}
     />
   );
 };
 
 export default InputTitleTop;
+
