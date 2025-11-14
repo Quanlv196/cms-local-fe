@@ -1,16 +1,13 @@
-const appMode = process.env.REACT_APP_APP_MODE || "development";
-let envBaseUrl: string = "http://localhost:8080";
-switch (appMode) {
-  case "development":
-    envBaseUrl = process.env.REACT_BASE_URL_DEV || "http://localhost:8080";
-    break;
-  case "production":
-    envBaseUrl = process.env.REACT_BASE_URL_PROD || "http://localhost:8080";
-    break;
-  default:
-    break;
-}
-export const baseUrl = "http://localhost:8008";
+// Initialize with default values if window._env_ is not defined
+const defaultEnv = {
+  REACT_APP_BASE_URL: "http://localhost:8080",
+  REACT_APP_APP_MODE: "development",
+};
+
+const _env_ = (typeof window !== "undefined" && window._env_) || defaultEnv;
+
+export const baseUrl = _env_.REACT_APP_BASE_URL;
+export const appMode = _env_.REACT_APP_APP_MODE;
 
 export const firebaseConfig = {
   apiKey: "",
@@ -26,3 +23,4 @@ export const SOCKET_URL = `${baseUrl}`;
 export const SOCKET_PATH = `/identity/socket`;
 export const NoImage =
   "https://stgppdgigpvi.blob.core.windows.net/zapp-images/149071.png";
+
