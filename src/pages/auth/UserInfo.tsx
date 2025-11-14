@@ -41,6 +41,11 @@ const UserInfo = () => {
         footer={null}
         onCancel={() => setIsChangePassword(false)}
         visible={isChangePassword}
+        style={{
+          borderRadius: 16,
+          overflow: "hidden",
+          padding: 0,
+        }}
       >
         <ChangePassword onClose={() => setIsChangePassword(false)} />
       </Modal>

@@ -6,7 +6,7 @@ import { Container } from "reactstrap";
 import { showRightSidebar } from "../redux/actions";
 
 // import logo from '../assets/images/logo.png';
-import logo from "../assets/images/bilet/logo-blue.png";
+import logo from "../assets/images/logo.png";
 import { Menu } from "react-feather";
 import UserProfile from "./UserProfile";
 
@@ -79,3 +79,4 @@ const Topbar: React.FC<Props> = (props: Props) => {
 };
 
 export default connector(Topbar);
+
