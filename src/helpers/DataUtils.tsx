@@ -3,6 +3,7 @@ export default class TextUtils {
    * 🧩 Format dữ liệu để gửi API
    * - Nếu object có { label, value, key } → lấy value
    * - Nếu object có { id, name } → lấy id
+   * - Nếu là mảng → map từng phần tử áp dụng quy tắc trên, convert string số → number
    * - Các object khác hoặc kiểu dữ liệu cơ bản → giữ nguyên
    */
   static formatDataForAPI = (obj: Record<string, any>): Record<string, any> => {
@@ -11,10 +12,28 @@ export default class TextUtils {
     for (const key in obj) {
       const value = obj[key];
 
-      if (
+      if (Array.isArray(value)) {
+        newObj[key] = value.map((item) => {
+          if (item && typeof item === "object" && !(item instanceof Date)) {
+            if ("label" in item && "value" in item && "key" in item) {
+              return item.value;
+            } else if ("id" in item && "name" in item) {
+              return item.id;
+            }
+          }
+          // Convert string số sang number
+          if (
+            typeof item === "string" &&
+            !isNaN(Number(item)) &&
+            item.trim() !== ""
+          ) {
+            return Number(item);
+          }
+          return item;
+        });
+      } else if (
         value &&
         typeof value === "object" &&
-        !Array.isArray(value) &&
         !(value instanceof Date)
       ) {
         if ("label" in value && "value" in value && "key" in value) {
@@ -78,3 +97,4 @@ export default class TextUtils {
     return filter;
   };
 }
+

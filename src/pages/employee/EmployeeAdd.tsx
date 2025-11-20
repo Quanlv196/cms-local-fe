@@ -38,6 +38,12 @@ interface Props {
   user: any;
 }
 
+export interface IAddress {
+  code: string;
+  name: string;
+  full_name: string;
+}
+
 const List: React.FC<Props> = (props: any) => {
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState(props.match.params.id);
@@ -49,6 +55,11 @@ const List: React.FC<Props> = (props: any) => {
   const [company, setCompany] = useState<Company[]>([]);
   const [platoon, setPlatoon] = useState<Platoon[]>([]);
   const [isNotFound, setIsNotFound] = useState(false);
+  const [provinces, setProvinces] = useState<IAddress[]>([]);
+  const [wards, setWards] = useState<IAddress[]>([]);
+  const [currentResidenceWards, setCurrentResidenceWards] = useState<
+    IAddress[]
+  >([]);
 
   useEffect(() => {
     if (id && id !== "add") {
@@ -68,7 +79,49 @@ const List: React.FC<Props> = (props: any) => {
 
   useEffect(() => {
     fetchBattalion();
+    fetchProvinces();
   }, []);
+
+  const fetchProvinces = async (name?: string) => {
+    const URL = `${baseUrl}/address/provinces`;
+    const response: any = await APIClient.GET(URL, { name, limit: 100 });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setProvinces(response.response?.data);
+    }
+  };
+
+  const fetchWards = async (name?: string, provinceCode?: string) => {
+    const province_code = provinceCode ?? data?.home_town_province_code;
+    const URL = `${baseUrl}/address/wards`;
+    const response: any = await APIClient.GET(URL, {
+      name,
+      province_code,
+    });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setWards(response.response?.data);
+    }
+  };
+
+  const fetchCurrentResidenceWards = async (
+    name?: string,
+    provinceCode?: string
+  ) => {
+    const province_code = provinceCode ?? data?.current_residence_province_code;
+    const URL = `${baseUrl}/address/wards`;
+    const response: any = await APIClient.GET(URL, {
+      name,
+      province_code,
+    });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setCurrentResidenceWards(response.response?.data);
+    }
+  };
 
   const fetchBattalion = async (name?: string) => {
     const URL = `${baseUrl}/battalion`;
@@ -124,6 +177,8 @@ const List: React.FC<Props> = (props: any) => {
       });
       fetchCompany("", resData?.battalion?.id);
       fetchPlatoon("", resData?.company?.id);
+      fetchWards("", resData?.home_town_province_code);
+      fetchCurrentResidenceWards("", resData?.current_residence_province_code);
     }
   };
 
@@ -153,6 +208,12 @@ const List: React.FC<Props> = (props: any) => {
         fetchCompany={fetchCompany}
         battalion={battalion}
         fetchBattalion={fetchBattalion}
+        provinces={provinces}
+        fetchProvinces={fetchProvinces}
+        wards={wards}
+        fetchWards={fetchWards}
+        currentResidenceWards={currentResidenceWards}
+        fetchCurrentResidenceWards={fetchCurrentResidenceWards}
       />
       <ModalPopup isOpen={modalIsOpen} onRequestClose={() => setIsOpen(false)}>
         <RenderActionModal
@@ -177,6 +238,12 @@ const ContentPage = (props: any) => {
     fetchCompany,
     platoon,
     fetchPlatoon,
+    provinces,
+    fetchProvinces,
+    wards,
+    fetchWards,
+    currentResidenceWards,
+    fetchCurrentResidenceWards,
   } = props;
   const [loading, setLoading] = useState(false);
   const router = useHistory();
@@ -280,6 +347,10 @@ const ContentPage = (props: any) => {
     delete params?.id;
     delete params?.updated_time;
     delete params?.updated_uid;
+    delete params?.home_town_ward;
+    delete params?.home_town_province;
+    delete params?.current_residence_province;
+    delete params?.current_residence_ward;
     let response: any = await APIClient.PUT(URL, params);
     setLoading(false);
     if (response.error !== undefined) {
@@ -289,6 +360,8 @@ const ContentPage = (props: any) => {
       router?.push(`/employee/list`);
     }
   };
+
+  console.log("dataxxx", data);
 
   const handleChangeFile = async (file: any, type: string) => {
     setLoading(true);
@@ -302,8 +375,6 @@ const ContentPage = (props: any) => {
     }
     setImgAvatar(file);
   };
-
-  console.log("dataxx", data);
 
   return (
     <div className="detail__page" style={{ margin: 20 }}>
@@ -320,11 +391,8 @@ const ContentPage = (props: any) => {
             value: data.birthday ? moment(data.birthday) : null,
           },
           { name: "company_id", value: data.company_id },
-          { name: "current_residence", value: data.current_residence },
-          { name: "home_town", value: data.home_town },
           { name: "platoon_id", value: data.platoon_id },
           { name: "battalion_id", value: data.battalion_id },
-          { name: "position", value: data.position },
           { name: "object", value: data.object },
           { name: "nation", value: data.nation },
           { name: "religion", value: data.religion },
@@ -429,14 +497,51 @@ const ContentPage = (props: any) => {
                     />
                   </Form.Item>
                 </Col>
+                <Col md={12} xs={24}>
+                  <Form.Item label="Tỉnh/Thành phố (Quê quán)">
+                    <DebounceSelect
+                      value={data?.home_town_province_code}
+                      labelInValue={false}
+                      fetchOptions={fetchProvinces}
+                      placeholder="Tìm kiếm Tỉnh/TP"
+                      onChange={(dt: any) => {
+                        setData({
+                          ...data,
+                          home_town_province_code: dt,
+                        });
+                        fetchWards("", dt);
+                      }}
+                      style={{ width: "100%" }}
+                      optionDefault={provinces}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col md={12} xs={24}>
+                  <Form.Item label="Xã/Phường (Quê quán)">
+                    <DebounceSelect
+                      value={data?.home_town_ward_code}
+                      disabled={isEmpty(data?.home_town_province_code)}
+                      labelInValue={false}
+                      fetchOptions={fetchWards}
+                      optionMerge={[data?.home_town_ward]}
+                      placeholder={
+                        data?.home_town_province_code
+                          ? "Tìm kiếm Xã/Phường"
+                          : "Vui lòng chọn Tỉnh/TP trước"
+                      }
+                      onChange={(dt: any) => {
+                        setData({
+                          ...data,
+                          home_town_ward_code: dt,
+                        });
+                      }}
+                      style={{ width: "100%" }}
+                      optionDefault={wards}
+                    />
+                  </Form.Item>
+                </Col>
                 <Col md={24} xs={24}>
-                  <Form.Item
-                    label="Quê quán"
-                    name="home_town"
-                    rules={[
-                      { required: true, message: "Quê quán là bắt buộc" },
-                    ]}
-                  >
+                  <Form.Item label="Địa chỉ chi tiết (Quê quán)">
                     <Input
                       type="text"
                       onChange={(e: any) => handleChangeInput(e)}
@@ -447,14 +552,51 @@ const ContentPage = (props: any) => {
                     />
                   </Form.Item>
                 </Col>
+                <Col md={12} xs={24}>
+                  <Form.Item label="Tỉnh/Thành phố (Chỗ ở hiện nay)">
+                    <DebounceSelect
+                      value={data?.current_residence_province_code}
+                      labelInValue={false}
+                      fetchOptions={fetchProvinces}
+                      placeholder="Tìm kiếm Tỉnh/TP"
+                      onChange={(dt: any) => {
+                        setData({
+                          ...data,
+                          current_residence_province_code: dt,
+                        });
+                        fetchCurrentResidenceWards("", dt);
+                      }}
+                      style={{ width: "100%" }}
+                      optionDefault={provinces}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col md={12} xs={24}>
+                  <Form.Item label="Xã/Phường (Chỗ ở hiện nay)">
+                    <DebounceSelect
+                      value={data?.current_residence_ward_code}
+                      disabled={isEmpty(data?.current_residence_province_code)}
+                      labelInValue={false}
+                      fetchOptions={fetchCurrentResidenceWards}
+                      optionMerge={[data?.current_residence_ward]}
+                      placeholder={
+                        data?.current_residence_province_code
+                          ? "Tìm kiếm Xã/Phường"
+                          : "Vui lòng chọn Tỉnh/TP trước"
+                      }
+                      onChange={(dt: any) => {
+                        setData({
+                          ...data,
+                          current_residence_ward_code: dt,
+                        });
+                      }}
+                      style={{ width: "100%" }}
+                      optionDefault={currentResidenceWards}
+                    />
+                  </Form.Item>
+                </Col>
                 <Col md={24} xs={24}>
-                  <Form.Item
-                    label="Chỗ ở hiện nay"
-                    name="current_residence"
-                    rules={[
-                      { required: true, message: "Chỗ ở hiện nay là bắt buộc" },
-                    ]}
-                  >
+                  <Form.Item label="Địa chỉ chi tiết (Chỗ ở hiện nay)">
                     <Input
                       type="text"
                       onChange={(e: any) => handleChangeInput(e)}
@@ -601,11 +743,7 @@ const ContentPage = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Form.Item
-                    label="Chức vụ"
-                    name="position"
-                    rules={[{ required: true, message: "Chức vụ là bắt buộc" }]}
-                  >
+                  <Form.Item label="Chức vụ">
                     <DebounceSelect
                       labelInValue={false}
                       value={data?.position}
@@ -691,25 +829,13 @@ const ContentPage = (props: any) => {
               </Row>
               <Row gutter={[20, 0]} align="middle">
                 <Col xxl={6} md={12}>
-                  <Form.Item label="Năm không hoàn thành nhiệm vụ">
+                  <Form.Item label="Năm hoàn thành xuất sắc nhiệm vụ">
                     <EditorComponent
                       type="text"
                       rows={2}
                       onChange={(e: any) => handleChangeInput(e)}
-                      value={data?.fail_year}
-                      name="fail_year"
-                      placeholder="Nhập nội dung"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xxl={6} md={12}>
-                  <Form.Item label="Năm hoàn thành nhiệm vụ">
-                    <EditorComponent
-                      type="text"
-                      rows={2}
-                      onChange={(e: any) => handleChangeInput(e)}
-                      value={data?.success_year}
-                      name="success_year"
+                      value={data?.excellent_year}
+                      name="excellent_year"
                       placeholder="Nhập nội dung"
                     />
                   </Form.Item>
@@ -727,13 +853,25 @@ const ContentPage = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col xxl={6} md={12}>
-                  <Form.Item label="Năm hoàn thành xuất sắc nhiệm vụ">
+                  <Form.Item label="Năm hoàn thành nhiệm vụ">
                     <EditorComponent
                       type="text"
                       rows={2}
                       onChange={(e: any) => handleChangeInput(e)}
-                      value={data?.excellent_year}
-                      name="excellent_year"
+                      value={data?.success_year}
+                      name="success_year"
+                      placeholder="Nhập nội dung"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xxl={6} md={12}>
+                  <Form.Item label="Năm không hoàn thành nhiệm vụ">
+                    <EditorComponent
+                      type="text"
+                      rows={2}
+                      onChange={(e: any) => handleChangeInput(e)}
+                      value={data?.fail_year}
+                      name="fail_year"
                       placeholder="Nhập nội dung"
                     />
                   </Form.Item>
@@ -825,6 +963,7 @@ const ContentPage = (props: any) => {
                       <DebounceSelect
                         labelInValue={false}
                         value={data?.care_infomation}
+                        mode="multiple"
                         placeholder="Chọn vấn đề"
                         onChange={(dt: any) => {
                           setData({
@@ -936,7 +1075,7 @@ const ContentPage = (props: any) => {
                     setData({ ...data, status: event?.target?.checked ? 1 : 0 })
                   }
                 >
-                  Hoạt động
+                  Đang công tác
                 </Checkbox>
               </div>
             </PageBody>

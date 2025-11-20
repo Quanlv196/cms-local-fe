@@ -1,6 +1,7 @@
 import { Battalion } from "../pages/configs/battalion/BattalionList";
 import { Company } from "../pages/configs/company/CompanyList";
 import { Platoon } from "../pages/configs/platoon/PlatoonList";
+import { IAddress } from "../pages/employee/EmployeeAdd";
 
 export interface Employee {
   id?: number;
@@ -39,6 +40,14 @@ export interface Employee {
   join_union_date?: string;
   join_party_date?: string;
   image?: string;
-  care_infomation?: number;
+  care_infomation?: number[];
+  home_town_province_code?: string;
+  home_town_ward_code?: string;
+  current_residence_province_code?: string;
+  current_residence_ward_code?: string;
+  home_town_province?: IAddress;
+  home_town_ward?: IAddress;
+  current_residence_province?: IAddress;
+  current_residence_ward?: IAddress;
 }
 

@@ -6,16 +6,19 @@ import TextUtils from "../helpers/TextUtils";
 interface IDebounceSelectProps extends SelectProps {
   fetchOptions?: any;
   debounceTimeout?: any;
-  optionDefault?: any;
+  optionDefault?: any[];
+  optionMerge?: any[];
 }
 
 export const DebounceSelect = ({
+  optionMerge,
   fetchOptions,
   loading,
   debounceTimeout = 800,
   ...props
 }: IDebounceSelectProps) => {
-  const { optionDefault, value, labelInValue } = props;
+  const { optionDefault, value, labelInValue, onBlur, onClear, onChange } =
+    props;
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState(optionDefault || []);
   const fetchRef = React.useRef(0);
@@ -43,6 +46,36 @@ export const DebounceSelect = ({
     return debounce(loadOptions, debounceTimeout);
   }, [fetchOptions, debounceTimeout]);
 
+  // 🔹 Handle blur - reset về optionDefault
+  const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
+    if (debounceFetcher) {
+      debounceFetcher("");
+    }
+    if (onBlur) {
+      onBlur(e);
+    }
+  };
+
+  // 🔹 Handle clear - set value = null
+  const handleClear = () => {
+    if (onClear) {
+      onClear();
+    } else if (onChange) {
+      onChange(null as any, null as any);
+    }
+  };
+
+  // 🔹 Handle onChange - xử lý cả trường hợp clear
+  const handleChange = (val: any, option: any) => {
+    if (val === undefined || val === null) {
+      // Clear event
+      handleClear();
+    } else {
+      // Normal change
+      onChange?.(val, option);
+    }
+  };
+
   const optionRenders = useMemo(() => {
     // 🔹 Chuẩn hóa từng option (kể cả khi optionDefault là object có id/name)
     const normalizeOption = (e: any) => {
@@ -51,16 +84,19 @@ export const DebounceSelect = ({
       }
       return {
         ...e,
-        value: e?.id ?? e?.value,
+        value: e?.id ?? e?.value ?? e?.code,
         label: e?.name ?? e?.label,
         optionData: e,
       };
     };
 
+    // 🔹 Merge optionMerge vào options
+    const mergedOptions = [...(optionMerge ?? []), ...(options ?? [])];
+
     // 🔹 Nếu labelInValue = false → value là string hoặc string[]
     // chỉ cần hiển thị options (không cần thêm value vào)
     if (!labelInValue) {
-      return (options ?? []).map(normalizeOption);
+      return uniqBy(mergedOptions.map(normalizeOption), "value");
     }
 
     // 🔹 Ngược lại: labelInValue = true → cần kết hợp value + options
@@ -70,9 +106,9 @@ export const DebounceSelect = ({
         : [value]
       : [];
 
-    const combined = [...values, ...(options ?? [])].map(normalizeOption);
+    const combined = [...values, ...mergedOptions].map(normalizeOption);
     return uniqBy(combined, "value");
-  }, [value, options, labelInValue, props?.mode]);
+  }, [value, options, optionMerge, labelInValue, props?.mode]);
 
   // 🔹 Chuẩn hóa value để hiển thị (xử lý cả trường hợp labelInValue = false)
   const valueRender = useMemo(() => {
@@ -99,8 +135,6 @@ export const DebounceSelect = ({
     };
   }, [value, labelInValue, props?.mode]);
 
-  console.log("fetchOptionsxx", valueRender, optionRenders);
-
   // 🔹 Hàm lọc mặc định có xử lý tiếng Việt (nếu không có fetchOptions)
   const filterOptionVi = (input: string, option: any) => {
     if (!option?.label) return false;
@@ -117,15 +151,23 @@ export const DebounceSelect = ({
       optionLabelProp="label"
       labelInValue={!isNil(labelInValue) ? labelInValue : true}
       showSearch
+      allowClear
+      autoClearSearchValue
       style={{ fontSize: 16, width: "100%" }}
       // 🔹 Nếu có fetchOptions thì dùng debounce search, nếu không thì search tiếng Việt
       filterOption={fetchOptions ? false : filterOptionVi}
       onSearch={(val) => {
+        // Reset options ngay khi bắt đầu search
+        if (val) {
+          setOptions([]);
+        }
         if (fetchOptions && debounceFetcher) {
-          console.log("Searching:", val);
           debounceFetcher(val);
         }
       }}
+      onBlur={handleBlur}
+      onClear={handleClear}
+      onChange={handleChange}
       notFoundContent={
         fetchOptions && fetching ? (
           <Spin size="small" />
@@ -138,3 +180,4 @@ export const DebounceSelect = ({
     />
   );
 };
+

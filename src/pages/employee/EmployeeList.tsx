@@ -41,6 +41,7 @@ import { Platoon } from "../configs/platoon/PlatoonList";
 import DataUtils from "../../helpers/DataUtils";
 import { useUser } from "../../hooks/useUser";
 import { Role } from "../../enums/common.enum";
+import { IAddress } from "./EmployeeAdd";
 interface Props {
   history: any;
   location: any;
@@ -309,6 +310,11 @@ const DataFilter = (props: any) => {
   const [battalion, setBattalion] = useState<Battalion[]>([]);
   const [company, setCompany] = useState<Company[]>([]);
   const [platoon, setPlatoon] = useState<Platoon[]>([]);
+  const [provinces, setProvinces] = useState<IAddress[]>([]);
+  const [wards, setWards] = useState<IAddress[]>([]);
+  const [currentResidenceWards, setCurrentResidenceWards] = useState<
+    IAddress[]
+  >([]);
   const { RangePicker } = DatePicker;
   const user = useUser();
 
@@ -316,7 +322,51 @@ const DataFilter = (props: any) => {
     fetchBattalion();
     fetchCompany();
     fetchPlatoon();
+    fetchProvinces();
+    fetchWards();
   }, []);
+
+  const fetchProvinces = async (name?: string) => {
+    const URL = `${baseUrl}/address/provinces`;
+    const response: any = await APIClient.GET(URL, { name, limit: 100 });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setProvinces(response.response?.data);
+    }
+  };
+
+  const fetchWards = async (name?: string, provinceCode?: string) => {
+    const province_code = provinceCode ?? filter?.home_town_province_code;
+    const URL = `${baseUrl}/address/wards`;
+    const response: any = await APIClient.GET(URL, {
+      name,
+      province_code,
+    });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setWards(response.response?.data);
+    }
+  };
+
+  const fetchCurrentResidenceWards = async (
+    name?: string,
+    provinceCode?: string
+  ) => {
+    const province_code =
+      provinceCode ?? filter?.current_residence_province_code;
+    const URL = `${baseUrl}/address/wards`;
+    const response: any = await APIClient.GET(URL, {
+      name,
+      province_code,
+    });
+    if (response.error) {
+      toast.error(response.error.error_description);
+    } else if (response.response) {
+      setCurrentResidenceWards(response.response?.data);
+    }
+  };
 
   const filterCount = useMemo(() => {
     return Object.keys(DataUtils.convertSearchParams(filter))?.length;
@@ -479,6 +529,72 @@ const DataFilter = (props: any) => {
                 }
               }}
               placeholder={["Từ năm", "Đến năm"]}
+            />
+          </Form.Item>
+          <Form.Item label="Tỉnh/Thành phố (Quê quán)">
+            <DebounceSelect
+              value={filter?.home_town_province_code}
+              labelInValue={false}
+              fetchOptions={fetchProvinces}
+              placeholder="Tìm kiếm Tỉnh/TP"
+              onChange={(dt: any) => {
+                setFilter({
+                  ...filter,
+                  home_town_province_code: dt,
+                });
+                fetchWards("", dt);
+              }}
+              style={{ width: "100%" }}
+              optionDefault={provinces}
+            />
+          </Form.Item>
+          <Form.Item label="Xã/Phường (Quê quán)">
+            <DebounceSelect
+              value={filter?.home_town_ward_code}
+              labelInValue={false}
+              fetchOptions={fetchWards}
+              placeholder="Tìm kiếm Xã/Phường"
+              onChange={(dt: any) => {
+                setFilter({
+                  ...filter,
+                  home_town_ward_code: dt,
+                });
+              }}
+              style={{ width: "100%" }}
+              optionDefault={wards}
+            />
+          </Form.Item>
+          <Form.Item label="Tỉnh/Thành phố (Chỗ ở hiện nay)">
+            <DebounceSelect
+              value={filter?.current_residence_province_code}
+              labelInValue={false}
+              fetchOptions={fetchProvinces}
+              placeholder="Tìm kiếm Tỉnh/TP"
+              onChange={(dt: any) => {
+                setFilter({
+                  ...filter,
+                  current_residence_province_code: dt,
+                });
+                fetchWards("", dt);
+              }}
+              style={{ width: "100%" }}
+              optionDefault={provinces}
+            />
+          </Form.Item>
+          <Form.Item label="Xã/Phường (Chỗ ở hiện nay)">
+            <DebounceSelect
+              value={filter?.current_residence_ward_code}
+              labelInValue={false}
+              fetchOptions={fetchWards}
+              placeholder="Tìm kiếm Xã/Phường"
+              onChange={(dt: any) => {
+                setFilter({
+                  ...filter,
+                  home_town_ward_code: dt,
+                });
+              }}
+              style={{ width: "100%" }}
+              optionDefault={wards}
             />
           </Form.Item>
           <Form.Item label="Đối tượng">
@@ -811,8 +927,24 @@ const DataTableList = (props: any) => {
                 {item?.name || "---"}
               </td>
               <td>{moment(item?.birthday).format("YYYY") || "---"}</td>
-              <td>{item?.home_town || "---"}</td>
-              <td>{item?.current_residence || "---"}</td>
+              <td>
+                {[
+                  item?.home_town_province?.name,
+                  item?.home_town_ward?.name,
+                  item?.home_town,
+                ]
+                  ?.filter(Boolean)
+                  ?.join(", ") || "---"}
+              </td>
+              <td>
+                {[
+                  item?.current_residence_province?.name,
+                  item?.current_residence_ward?.name,
+                  item?.current_residence,
+                ]
+                  ?.filter(Boolean)
+                  ?.join(", ") || "---"}
+              </td>
               <td>
                 {OBJECT_OPTIONS?.find((e) => e?.value === item?.object)
                   ?.label || "---"}
@@ -859,13 +991,16 @@ const DataTableList = (props: any) => {
                   : "--"}
               </td>
               <td>
-                {SCHOOL_OPTIONS?.find((e) => e?.value === item?.care_infomation)
+                {SCHOOL_OPTIONS?.find((e) => e?.value === item?.school)
                   ?.label || "---"}
               </td>
               <td>{item?.is_care && "Cần quan tâm"}</td>
               <td>
-                {CARE_OPTIONS?.find((e) => e?.value === item?.care_infomation)
-                  ?.label || "---"}
+                {CARE_OPTIONS?.filter((e) =>
+                  item?.care_infomation?.includes(e?.value)
+                )
+                  ?.map((u) => u?.label)
+                  ?.join(", ") || "---"}
               </td>
               <td>{getLabelStatus(item?.status)}</td>
 

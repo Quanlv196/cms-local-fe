@@ -64,7 +64,7 @@ export const STATUS_OPTIONS = [
   { value: "0", label: "Không còn công tác" },
 ];
 export const OBJECT_OPTIONS = [
-  { value: ObjectType.SQ, label: "Sĩ Quan" },
+  { value: ObjectType.SQ, label: "Sĩ quan" },
   { value: ObjectType.QNCN, label: "Quân nhân chuyên nghiệp" },
   { value: ObjectType.HSQ_BS, label: "Hạ sĩ quan" },
   { value: ObjectType.CS_MOI, label: "Chiến sĩ mới" },
@@ -198,7 +198,7 @@ export const SCHOOL_OPTIONS = [
   { value: 5, label: "Học viện Hậu cần" },
   { value: 6, label: "Học viện Kỹ thuật" },
   { value: 7, label: "Học viện Quân y" },
-  { value: 8, label: "Trường ngoài quân đội" },
+  { value: 8, label: "Trường khác" },
 ];
 
 export const CARE_OPTIONS = [
@@ -207,3 +207,4 @@ export const CARE_OPTIONS = [
   { value: 3, label: "Sức khoẻ" },
   { value: 4, label: "Quan hệ xã hội" },
 ];
+
