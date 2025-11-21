@@ -6,7 +6,7 @@ import { Container } from "reactstrap";
 import { showRightSidebar } from "../redux/actions";
 
 // import logo from '../assets/images/logo.png';
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/app-local/logo_app.png";
 import { Menu } from "react-feather";
 import UserProfile from "./UserProfile";
 

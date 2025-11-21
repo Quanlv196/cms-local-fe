@@ -27,6 +27,7 @@ import APIClient from "../../helpers/APIClient";
 import { baseUrl } from "../../constants/environment";
 import ParticleBackground from "./components/ParticleBackground";
 import UserManager from "../../manager/UserManager";
+import Logo from "../../assets/images/app-local/logo_app.png";
 
 const titlePage = "Đăng nhập hệ thống";
 
@@ -125,96 +126,98 @@ const Login: React.FC = () => {
       {(isMounted || !isAuthTokenValid) && (
         <div className="account-pages account-pages-bg">
           <ParticleBackground />
-          <Container>
-            <div className="login__box">
-              {/* <div className="logo">
-                <img src={logo} alt="logo" />
-              </div> */}
-              <Card
-                className="login__content"
-                style={{
-                  borderRadius: "1rem",
-                  overflow: "hidden",
-                  width: 500,
-                  maxWidth: "100%",
-                  boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <CardBody className="p-5">
-                  {isLoading && <Loader />}
-                  <div className="mx-auto mb-4">
-                    <a className="logo-login" href="/">
-                      <h3 className="d-inline align-middle ml-1 font-weight-bold">
-                        Đăng nhập
-                      </h3>
-                    </a>
-                  </div>
-                  {errorMessage && (
-                    <Alert color="danger" isOpen={!!errorMessage}>
-                      <div>{errorMessage}</div>
-                    </Alert>
-                  )}
+          <div className="login_main">
+            <Container>
+              <div className="login__box">
+                <div className="logo">
+                  <img src={Logo} style={{ height: 200 }} alt="logo" />
+                </div>
+                <Card
+                  className="login__content"
+                  style={{
+                    borderRadius: "1rem",
+                    overflow: "hidden",
+                    width: 500,
+                    maxWidth: "100%",
+                    boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <CardBody className="p-5">
+                    {isLoading && <Loader />}
+                    <div className="mx-auto mb-4">
+                      <a className="logo-login" href="/">
+                        <h3 className="d-inline align-middle ml-1 font-weight-bold">
+                          Đăng nhập
+                        </h3>
+                      </a>
+                    </div>
+                    {errorMessage && (
+                      <Alert color="danger" isOpen={!!errorMessage}>
+                        <div>{errorMessage}</div>
+                      </Alert>
+                    )}
 
-                  <AvForm onValidSubmit={handleValidSubmit}>
-                    <AvGroup>
-                      <Label for="username">Tên đăng nhập</Label>
-                      <InputGroup>
-                        <InputGroupAddon addonType="prepend">
-                          <span className="input-group-text">
-                            <i className="uil uil-envelope-alt"></i>
-                          </span>
-                        </InputGroupAddon>
-                        <Input
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          type="text"
-                          autoComplete="off"
-                          name="username"
-                          id="username"
-                          placeholder="Nhập tên đăng nhập"
-                        />
-                      </InputGroup>
-                      <AvFeedback>Trường này là bắt buộc</AvFeedback>
-                    </AvGroup>
+                    <AvForm onValidSubmit={handleValidSubmit}>
+                      <AvGroup>
+                        <Label for="username">Tên đăng nhập</Label>
+                        <InputGroup>
+                          <InputGroupAddon addonType="prepend">
+                            <span className="input-group-text">
+                              <i className="uil uil-envelope-alt mt-1"></i>
+                            </span>
+                          </InputGroupAddon>
+                          <Input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            type="text"
+                            autoComplete="off"
+                            name="username"
+                            id="username"
+                            placeholder="Nhập tên đăng nhập"
+                          />
+                        </InputGroup>
+                        <AvFeedback>Trường này là bắt buộc</AvFeedback>
+                      </AvGroup>
 
-                    <AvGroup className="mb-3">
-                      <Label for="password">Mật khẩu</Label>
-                      <InputGroup>
-                        <InputGroupAddon addonType="prepend">
-                          <span className="input-group-text">
-                            <i className="uil uil-lock"></i>
-                          </span>
-                        </InputGroupAddon>
-                        <AvInput
-                          onChange={(e: any) => setPassword(e.target.value)}
-                          type={pwdShow ? "text" : "password"}
-                          autoComplete="off"
-                          name="password"
-                          id="password"
-                          placeholder="Mật khẩu"
-                          value={password}
-                        />
-                      </InputGroup>
-                      <AvFeedback>Trường này là bắt buộc</AvFeedback>
-                    </AvGroup>
+                      <AvGroup className="mb-3">
+                        <Label for="password">Mật khẩu</Label>
+                        <InputGroup>
+                          <InputGroupAddon addonType="prepend">
+                            <span className="input-group-text">
+                              <i className="uil uil-lock"></i>
+                            </span>
+                          </InputGroupAddon>
+                          <AvInput
+                            onChange={(e: any) => setPassword(e.target.value)}
+                            type={pwdShow ? "text" : "password"}
+                            autoComplete="off"
+                            name="password"
+                            id="password"
+                            placeholder="Mật khẩu"
+                            value={password}
+                          />
+                        </InputGroup>
+                        <AvFeedback>Trường này là bắt buộc</AvFeedback>
+                      </AvGroup>
 
-                    <FormGroup className="form-group mb-0 mt-4 text-center">
-                      <Button
-                        disabled={!validate}
-                        color="primary"
-                        className="btn-block"
-                      >
-                        Đăng nhập
-                      </Button>
-                    </FormGroup>
-                  </AvForm>
-                </CardBody>
-              </Card>
-              {/* <div className="slogan">
+                      <FormGroup className="form-group mb-0 mt-4 text-center">
+                        <Button
+                          disabled={!validate}
+                          color="primary"
+                          className="btn-block"
+                        >
+                          Đăng nhập
+                        </Button>
+                      </FormGroup>
+                    </AvForm>
+                  </CardBody>
+                </Card>
+                {/* <div className="slogan">
                 <img src={slogan} alt="logo" />
               </div> */}
-            </div>
-          </Container>
+              </div>
+            </Container>
+          </div>
         </div>
       )}
     </React.Fragment>
@@ -222,3 +225,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
