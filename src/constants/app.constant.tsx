@@ -148,6 +148,45 @@ export const POSITION_OPTIONS = [
 
   // CẤP TRUNG ĐỘI
   { value: PositionType.TRUNG_DOI_TRUONG, label: "Trung đội trưởng" },
+
+  // QUÂN NHÂN CHUYÊN NGHIỆP
+  { value: PositionType.LAI_XE, label: "Lái xe" },
+  { value: PositionType.QUAN_LY, label: "Quản lý" },
+  { value: PositionType.NHAN_VIEN_TAI_CHINH, label: "Nhân viên tài chính" },
+  { value: PositionType.Y_SI, label: "Y sĩ" },
+  { value: PositionType.NHAN_VIEN_NAU_AN, label: "Nhân viên nấu ăn" },
+  { value: PositionType.BEP_TRUONG, label: "Bếp trưởng" },
+  { value: PositionType.NHAN_VIEN_QUAN_NHU, label: "Nhân viên quân nhu" },
+  { value: PositionType.NHAN_VIEN_XANG_DAU, label: "Nhân viên xăng dầu" },
+  { value: PositionType.NHAN_VIEN_DOAN_TRAI, label: "Nhân viên doanh trại" },
+  { value: PositionType.DUOC_SI, label: "Dược sĩ" },
+  { value: PositionType.NHAN_VIEN_THONG_KE, label: "Nhân viên thống kê" },
+  { value: PositionType.NHAN_VIEN_HOA_NGHIEM, label: "Nhân viên hoá nghiệm" },
+  { value: PositionType.THO_SUA_CHUA_KHI_TAI, label: "Thợ sửa chữa khí tài" },
+  { value: PositionType.THO_SUA_CHUA_O_TO, label: "Thợ sửa chữa ô tô" },
+  { value: PositionType.THU_KHO, label: "Thủ kho" },
+  {
+    value: PositionType.THO_SUA_CHUA_THONG_TIN,
+    label: "Thợ sửa chữa thông tin",
+  },
+  { value: PositionType.DAI_TRUONG_BAO_VU, label: "Đài trưởng báo vụ" },
+  { value: PositionType.NHAN_VIEN_BAO_VU, label: "Nhân viên báo vụ" },
+  { value: PositionType.NHAN_VIEN_BAO_MAT, label: "Nhân viên bảo mật" },
+  { value: PositionType.NHAN_VIEN_CO_YEU, label: "Nhân viên cơ yếu" },
+  { value: PositionType.NHAN_VIEN_LUC, label: "Nhân viên lực" },
+  {
+    value: PositionType.NHAN_VIEN_CONG_NGHE_THONG_TIN,
+    label: "Nhân viên công nghệ thông tin",
+  },
+  { value: PositionType.NHAN_VIEN_DO_BAN, label: "Nhân viên đồ bản" },
+
+  // HẠ SĨ QUAN
+  { value: PositionType.TIEU_DOI_TRUONG, label: "Tiểu đội trưởng" },
+  { value: PositionType.Y_TA, label: "Y tá" },
+  { value: PositionType.BAO_VU, label: "Báo vụ" },
+
+  // CHIẾN SĨ MỚI
+  { value: PositionType.CHIEN_SI_MOI, label: "Chiến sĩ mới" },
 ];
 
 export const MISSION_COMPLETE_OPTIONS = [
@@ -188,6 +227,107 @@ export const RoleByObjectTypeLabel: Record<
     { value: RoleType.THUONG_SI, label: "Thượng sĩ" },
   ],
   [ObjectType.CS_MOI]: [{ value: RoleType.BINH_NHI, label: "Binh nhì" }],
+};
+
+export const PositionByObjectTypeLabel: Record<
+  ObjectType,
+  { value: PositionType; label: string }[]
+> = {
+  [ObjectType.SQ]: [
+    // CẤP LỮ ĐOÀN
+    { value: PositionType.LU_DOAN_TRUONG, label: "Lữ đoàn trưởng" },
+    { value: PositionType.CHINH_UY_LU_DOAN, label: "Chính ủy Lữ đoàn" },
+    { value: PositionType.PHO_LU_DOAN_TRUONG, label: "Phó Lữ đoàn trưởng" },
+    { value: PositionType.PHO_CHINH_UY_LU_DOAN, label: "Phó Chính ủy Lữ đoàn" },
+
+    // PHÒNG THAM MƯU
+    { value: PositionType.THAM_MUU_TRUONG, label: "Tham mưu trưởng" },
+    { value: PositionType.PHO_THAM_MUU_TRUONG, label: "Phó Tham mưu trưởng" },
+
+    // PHÒNG CHÍNH TRỊ
+    { value: PositionType.CHU_NHIEM_CHINH_TRI, label: "Chủ nhiệm Chính trị" },
+    {
+      value: PositionType.PHO_CHU_NHIEM_CHINH_TRI,
+      label: "Phó Chủ nhiệm Chính trị",
+    },
+
+    // PHÒNG HẬU CẦN KỸ THUẬT
+    {
+      value: PositionType.CHU_NHIEM_HAU_CAN_KY_THUAT,
+      label: "Chủ nhiệm Hậu cần Kỹ thuật",
+    },
+    {
+      value: PositionType.PHO_CHU_NHIEM_HAU_CAN_KY_THUAT,
+      label: "Phó Chủ nhiệm Hậu cần Kỹ thuật",
+    },
+
+    // CẤP TIỂU ĐOÀN
+    { value: PositionType.TIEU_DOAN_TRUONG, label: "Tiểu đoàn trưởng" },
+    {
+      value: PositionType.CHINH_TRI_VIEN_TIEU_DOAN,
+      label: "Chính trị viên Tiểu đoàn",
+    },
+    { value: PositionType.PHO_TIEU_DOAN_TRUONG, label: "Phó Tiểu đoàn trưởng" },
+    {
+      value: PositionType.CHINH_TRI_VIEN_PHO_TIEU_DOAN,
+      label: "Chính trị viên Phó Tiểu đoàn",
+    },
+
+    // CẤP ĐẠI ĐỘI
+    { value: PositionType.DAI_DOI_TRUONG, label: "Đại đội trưởng" },
+    {
+      value: PositionType.CHINH_TRI_VIEN_DAI_DOI,
+      label: "Chính trị viên Đại đội",
+    },
+    { value: PositionType.PHO_DAI_DOI_TRUONG, label: "Phó Đại đội trưởng" },
+    {
+      value: PositionType.CHINH_TRI_VIEN_PHO_DAI_DOI,
+      label: "Chính trị viên Phó Đại đội",
+    },
+
+    // CẤP TRUNG ĐỘI
+    { value: PositionType.TRUNG_DOI_TRUONG, label: "Trung đội trưởng" },
+  ],
+  [ObjectType.QNCN]: [
+    { value: PositionType.LAI_XE, label: "Lái xe" },
+    { value: PositionType.QUAN_LY, label: "Quản lý" },
+    { value: PositionType.NHAN_VIEN_TAI_CHINH, label: "Nhân viên tài chính" },
+    { value: PositionType.Y_SI, label: "Y sĩ" },
+    { value: PositionType.NHAN_VIEN_NAU_AN, label: "Nhân viên nấu ăn" },
+    { value: PositionType.BEP_TRUONG, label: "Bếp trưởng" },
+    { value: PositionType.NHAN_VIEN_QUAN_NHU, label: "Nhân viên quân nhu" },
+    { value: PositionType.NHAN_VIEN_XANG_DAU, label: "Nhân viên xăng dầu" },
+    { value: PositionType.NHAN_VIEN_DOAN_TRAI, label: "Nhân viên doanh trại" },
+    { value: PositionType.DUOC_SI, label: "Dược sĩ" },
+    { value: PositionType.NHAN_VIEN_THONG_KE, label: "Nhân viên thống kê" },
+    { value: PositionType.NHAN_VIEN_HOA_NGHIEM, label: "Nhân viên hoá nghiệm" },
+    { value: PositionType.THO_SUA_CHUA_KHI_TAI, label: "Thợ sửa chữa khí tài" },
+    { value: PositionType.THO_SUA_CHUA_O_TO, label: "Thợ sửa chữa ô tô" },
+    { value: PositionType.THU_KHO, label: "Thủ kho" },
+    {
+      value: PositionType.THO_SUA_CHUA_THONG_TIN,
+      label: "Thợ sửa chữa thông tin",
+    },
+    { value: PositionType.DAI_TRUONG_BAO_VU, label: "Đài trưởng báo vụ" },
+    { value: PositionType.NHAN_VIEN_BAO_VU, label: "Nhân viên báo vụ" },
+    { value: PositionType.NHAN_VIEN_BAO_MAT, label: "Nhân viên bảo mật" },
+    { value: PositionType.NHAN_VIEN_CO_YEU, label: "Nhân viên cơ yếu" },
+    { value: PositionType.NHAN_VIEN_LUC, label: "Nhân viên lực" },
+    {
+      value: PositionType.NHAN_VIEN_CONG_NGHE_THONG_TIN,
+      label: "Nhân viên công nghệ thông tin",
+    },
+    { value: PositionType.NHAN_VIEN_DO_BAN, label: "Nhân viên đồ bản" },
+  ],
+  [ObjectType.HSQ_BS]: [
+    { value: PositionType.TIEU_DOI_TRUONG, label: "Tiểu đội trưởng" },
+    { value: PositionType.LAI_XE, label: "Lái xe" },
+    { value: PositionType.Y_TA, label: "Y tá" },
+    { value: PositionType.BAO_VU, label: "Báo vụ" },
+  ],
+  [ObjectType.CS_MOI]: [
+    { value: PositionType.CHIEN_SI_MOI, label: "Chiến sĩ mới" },
+  ],
 };
 
 export const SCHOOL_OPTIONS = [

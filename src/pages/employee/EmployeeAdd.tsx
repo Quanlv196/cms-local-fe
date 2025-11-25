@@ -14,7 +14,7 @@ import {
   CARE_OPTIONS,
   NATION_OPTIONS,
   OBJECT_OPTIONS,
-  POSITION_OPTIONS,
+  PositionByObjectTypeLabel,
   REGILION_OPTIONS,
   RoleByObjectTypeLabel,
   SCHOOL_OPTIONS,
@@ -687,6 +687,7 @@ const ContentPage = (props: any) => {
                           ...data,
                           object: dt,
                           role: null,
+                          position: null,
                         });
                       }}
                       style={{ width: "100%" }}
@@ -745,9 +746,14 @@ const ContentPage = (props: any) => {
                 <Col md={12} xs={24}>
                   <Form.Item label="Chức vụ">
                     <DebounceSelect
+                      disabled={isEmpty(data?.object)}
                       labelInValue={false}
                       value={data?.position}
-                      placeholder="Tìm kiếm"
+                      placeholder={
+                        isEmpty(data?.object)
+                          ? "Vui lòng chọn đối tượng trước"
+                          : "Chọn chức vụ"
+                      }
                       onChange={(dt: any) => {
                         setData({
                           ...data,
@@ -755,7 +761,11 @@ const ContentPage = (props: any) => {
                         });
                       }}
                       style={{ width: "100%" }}
-                      optionDefault={POSITION_OPTIONS}
+                      optionDefault={
+                        PositionByObjectTypeLabel?.[
+                          data?.object as ObjectType
+                        ] || []
+                      }
                     />
                   </Form.Item>
                 </Col>
