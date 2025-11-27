@@ -264,6 +264,7 @@ const ContentPage = (props: any) => {
     const URL = `${baseUrl}/employee`;
     const params = DataUtils.formatDataForAPI({
       ...data,
+      care_infomation: data?.care_infomation || [],
       birthday: moment(data?.birthday).valueOf(),
       position_time: data?.position_time
         ? moment(data?.position_time).valueOf()
@@ -310,6 +311,7 @@ const ContentPage = (props: any) => {
     const URL = `${baseUrl}/employee/${data?.id}`;
     const params = DataUtils.formatDataForAPI({
       ...data,
+      care_infomation: data?.care_infomation || [],
       birthday: moment(data?.birthday).valueOf(),
       position_time: data?.position_time
         ? moment(data?.position_time).valueOf()
@@ -508,6 +510,7 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           home_town_province_code: dt,
+                          home_town_ward_code: null,
                         });
                         fetchWards("", dt);
                       }}
@@ -563,6 +566,7 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           current_residence_province_code: dt,
+                          current_residence_ward_code: null,
                         });
                         fetchCurrentResidenceWards("", dt);
                       }}
@@ -959,7 +963,7 @@ const ContentPage = (props: any) => {
                         setData({
                           ...data,
                           is_care: event?.target?.checked,
-                          care_infomation: undefined,
+                          care_infomation: [],
                         })
                       }
                     >

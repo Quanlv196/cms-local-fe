@@ -82,12 +82,20 @@ export const DebounceSelect = ({
       if (typeof e === "string" || typeof e === "number") {
         return { value: e, label: e };
       }
-      return {
+
+      const normalized = {
         ...e,
         value: e?.id ?? e?.value ?? e?.code,
         label: e?.name ?? e?.label,
         optionData: e,
       };
+
+      // 🔹 Trả về null nếu value hoặc label là undefined
+      if (normalized.value === undefined || normalized.label === undefined) {
+        return null;
+      }
+
+      return normalized;
     };
 
     // 🔹 Merge optionMerge vào options
@@ -96,7 +104,10 @@ export const DebounceSelect = ({
     // 🔹 Nếu labelInValue = false → value là string hoặc string[]
     // chỉ cần hiển thị options (không cần thêm value vào)
     if (!labelInValue) {
-      return uniqBy(mergedOptions.map(normalizeOption), "value");
+      return uniqBy(
+        mergedOptions.map(normalizeOption).filter(Boolean),
+        "value"
+      );
     }
 
     // 🔹 Ngược lại: labelInValue = true → cần kết hợp value + options
@@ -106,7 +117,9 @@ export const DebounceSelect = ({
         : [value]
       : [];
 
-    const combined = [...values, ...mergedOptions].map(normalizeOption);
+    const combined = [...values, ...mergedOptions]
+      .map(normalizeOption)
+      .filter(Boolean);
     return uniqBy(combined, "value");
   }, [value, options, optionMerge, labelInValue, props?.mode]);
 
@@ -144,6 +157,8 @@ export const DebounceSelect = ({
     ).toLowerCase();
     return labelNoAccent.includes(inputNoAccent);
   };
+
+  console.log("optionRendersxx", optionRenders);
 
   return (
     <Select

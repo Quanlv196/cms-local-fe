@@ -220,7 +220,9 @@ const List: React.FC<Props> = (props: any) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `employees_${new Date().getTime()}.xlsx`;
+      a.download = `danh_sach_quan_nhan_${moment(new Date().getTime()).format(
+        "YYYY_MM_DD_HH:mm"
+      )}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
