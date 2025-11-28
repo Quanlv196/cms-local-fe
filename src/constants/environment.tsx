@@ -4,7 +4,13 @@ const defaultEnv = {
   REACT_APP_APP_MODE: process.env.REACT_APP_APP_MODE || "development",
 };
 
-const _env_ = (typeof window !== "undefined" && window._env_) || defaultEnv;
+// Check if running on Vercel (build time env vars available)
+const isVercel = process.env.REACT_APP_ISVERCEL === "1";
+
+const _env_ = isVercel
+  ? defaultEnv // Use Vercel environment variables
+  : (typeof window !== "undefined" && window._env_) || defaultEnv; // Use window._env_ for Docker
+// const _env_ = (typeof window !== "undefined" && window._env_) || defaultEnv;
 
 export const baseUrl = _env_.REACT_APP_BASE_URL;
 export const appMode = _env_.REACT_APP_APP_MODE;
