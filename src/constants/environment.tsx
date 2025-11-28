@@ -1,7 +1,7 @@
 // Initialize with default values if window._env_ is not defined
 const defaultEnv = {
-  REACT_APP_BASE_URL: "http://localhost:8008",
-  REACT_APP_APP_MODE: "development",
+  REACT_APP_BASE_URL: process.env.REACT_APP_BASE_URL || "http://localhost:8008",
+  REACT_APP_APP_MODE: process.env.REACT_APP_APP_MODE || "development",
 };
 
 const _env_ = (typeof window !== "undefined" && window._env_) || defaultEnv;
