@@ -56,12 +56,23 @@ export default class TextUtils {
    * - "true"/"false" → boolean
    * - "null"/"undefined" → null/undefined
    * - Chuỗi số → number
+   * - Chuỗi có dấu phẩy (vd: "1,2,3") → array of numbers
    */
-  static parseValue = (value: any): any => {
+  static parseValue = (value: any, key?: string): any => {
     if (value === "true") return true;
     if (value === "false") return false;
     if (value === "null") return null;
     if (value === "undefined") return undefined;
+
+    // Xử lý care_infomation: convert "3,2" thành [3, 2]
+    if (typeof value === "string" && value.includes(",")) {
+      return value.split(",").map((v) => {
+        const trimmed = v.trim();
+        return !isNaN(Number(trimmed)) && trimmed !== ""
+          ? Number(trimmed)
+          : trimmed;
+      });
+    }
 
     if (
       typeof value === "string" &&
@@ -87,7 +98,7 @@ export default class TextUtils {
 
     Object.keys(params).forEach((key) => {
       if (!excludeKeys.includes(key)) {
-        const value = TextUtils.parseValue(params[key]);
+        const value = TextUtils.parseValue(params[key], key);
         if (value !== null && value !== undefined && value !== "") {
           filter[key] = value;
         }

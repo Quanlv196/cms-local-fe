@@ -776,7 +776,9 @@ const DataFilter = (props: any) => {
                 labelInValue={false}
                 value={filter?.care_infomation}
                 placeholder="Chọn vấn đề"
+                mode="multiple"
                 allowClear
+                maxTagCount={1}
                 onChange={(dt: any) => {
                   setFilter({
                     ...filter,
@@ -973,7 +975,15 @@ const DataTableList = (props: any) => {
                     : "--"}
                 </div>
               </td>
-              <td>{`${item?.platoon?.name}/${item?.company?.name}/${item?.battalion?.name}`}</td>
+              <td>
+                {[
+                  item?.platoon?.name,
+                  item?.company?.name,
+                  item?.battalion?.name,
+                ]
+                  ?.filter(Boolean)
+                  .join("/")}
+              </td>
               <td>
                 {NATION_OPTIONS?.find((e) => e?.value === item?.nation)
                   ?.label || "---"}

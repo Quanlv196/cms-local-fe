@@ -79,6 +79,7 @@ const List: React.FC<Props> = (props: any) => {
 
   useEffect(() => {
     fetchBattalion();
+    fetchCompany();
     fetchProvinces();
   }, []);
 
@@ -133,12 +134,24 @@ const List: React.FC<Props> = (props: any) => {
     }
   };
 
-  const fetchCompany = async (
-    name?: string,
-    battalion_id: number = data?.battalion_id?.value
-  ) => {
+  const fetchCompany = async (name?: string, battalion_id?: number | null) => {
     const URL = `${baseUrl}/company`;
-    const response: any = await APIClient.GET(URL, { name, battalion_id });
+    const params: any = { name };
+
+    // Nếu có truyền battalion_id (kể cả null)
+    if (battalion_id !== undefined) {
+      if (battalion_id !== null) {
+        params.battalion_id = battalion_id;
+      }
+      // Nếu battalion_id = null thì không thêm vào params (để lấy tất cả)
+    } else {
+      // Không truyền battalion_id -> dùng giá trị từ data
+      if (data?.battalion_id?.value) {
+        params.battalion_id = data.battalion_id.value;
+      }
+    }
+
+    const response: any = await APIClient.GET(URL, params);
     if (response.error) {
       toast.error(response.error.error_description);
     } else if (response.response) {
@@ -146,12 +159,24 @@ const List: React.FC<Props> = (props: any) => {
     }
   };
 
-  const fetchPlatoon = async (
-    name?: string,
-    company_id: number = data?.company_id?.value
-  ) => {
+  const fetchPlatoon = async (name?: string, company_id?: number | null) => {
     const URL = `${baseUrl}/platoon`;
-    const response: any = await APIClient.GET(URL, { name, company_id });
+    const params: any = { name };
+
+    // Nếu có truyền company_id (kể cả null)
+    if (company_id !== undefined) {
+      if (company_id !== null) {
+        params.company_id = company_id;
+      }
+      // Nếu company_id = null thì không thêm vào params (để lấy tất cả)
+    } else {
+      // Không truyền company_id -> dùng giá trị từ data
+      if (data?.company_id?.value) {
+        params.company_id = data.company_id.value;
+      }
+    }
+
+    const response: any = await APIClient.GET(URL, params);
     if (response.error) {
       toast.error(response.error.error_description);
     } else if (response.response) {
@@ -394,7 +419,7 @@ const ContentPage = (props: any) => {
           },
           { name: "company_id", value: data.company_id },
           { name: "platoon_id", value: data.platoon_id },
-          { name: "battalion_id", value: data.battalion_id },
+          // { name: "battalion_id", value: data.battalion_id },
           { name: "object", value: data.object },
           { name: "nation", value: data.nation },
           { name: "religion", value: data.religion },
@@ -1001,23 +1026,24 @@ const ContentPage = (props: any) => {
                 <Col md={24} xs={24}>
                   <Form.Item
                     label="Tiểu đoàn"
-                    name="battalion_id"
-                    rules={[
-                      { required: true, message: "Tiểu đoàn là bắt buộc" },
-                    ]}
+                    // name="battalion_id"
+                    // rules={[
+                    //   { required: true, message: "Tiểu đoàn là bắt buộc" },
+                    // ]}
                   >
                     <DebounceSelect
                       value={data?.battalion_id}
                       placeholder="Tìm kiếm"
                       fetchOptions={fetchBattalion}
                       onChange={(dt: any) => {
+                        console.log("dtxx", dt);
                         setData({
                           ...data,
                           battalion_id: dt,
                           company_id: null,
                           platoon_id: null,
                         });
-                        fetchCompany("", dt?.value);
+                        fetchCompany("", !isNil(dt) ? dt?.value : null);
                       }}
                       style={{ width: "100%" }}
                       optionDefault={battalion}
@@ -1032,20 +1058,21 @@ const ContentPage = (props: any) => {
                   >
                     <DebounceSelect
                       value={data?.company_id}
-                      placeholder={
-                        isNil(data?.battalion_id)
-                          ? "Vui lòng chọn tiểu đoàn trước"
-                          : "Tìm kiếm"
-                      }
+                      // placeholder={
+                      //   isNil(data?.battalion_id)
+                      //     ? "Vui lòng chọn tiểu đoàn trước"
+                      //     : "Tìm kiếm"
+                      // }
+                      placeholder="Tìm kiếm"
                       fetchOptions={fetchCompany}
-                      disabled={isNil(data?.battalion_id)}
+                      // disabled={isNil(data?.battalion_id)}
                       onChange={(dt: any) => {
                         setData({
                           ...data,
                           company_id: dt,
                           platoon_id: null,
                         });
-                        fetchPlatoon("", dt?.value);
+                        fetchPlatoon("", !isNil(dt) ? dt?.value : null);
                       }}
                       style={{ width: "100%" }}
                       optionDefault={company}

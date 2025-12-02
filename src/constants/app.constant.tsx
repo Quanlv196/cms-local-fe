@@ -324,10 +324,9 @@ export const PositionByObjectTypeLabel: Record<
     { value: PositionType.LAI_XE, label: "Lái xe" },
     { value: PositionType.Y_TA, label: "Y tá" },
     { value: PositionType.BAO_VU, label: "Báo vụ" },
+    { value: PositionType.CHIEN_SI_MOI, label: "Chiến sĩ" },
   ],
-  [ObjectType.CS_MOI]: [
-    { value: PositionType.CHIEN_SI_MOI, label: "Chiến sĩ mới" },
-  ],
+  [ObjectType.CS_MOI]: [],
 };
 
 export const SCHOOL_OPTIONS = [
@@ -346,5 +345,6 @@ export const CARE_OPTIONS = [
   { value: 2, label: "Tư tưởng" },
   { value: 3, label: "Sức khoẻ" },
   { value: 4, label: "Quan hệ xã hội" },
+  { value: 5, label: "Vấn đề khác" },
 ];
 

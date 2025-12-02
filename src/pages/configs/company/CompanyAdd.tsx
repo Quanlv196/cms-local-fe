@@ -116,7 +116,7 @@ const List = (props: IDetailProps) => {
       className="form_normal"
       fields={[
         { name: "name", value: data?.name },
-        { name: "battalion_id", value: data?.battalion_id },
+        // { name: "battalion_id", value: data?.battalion_id },
       ]}
     >
       <div className={"form__box p-3"}>
@@ -137,8 +137,8 @@ const List = (props: IDetailProps) => {
             </Form.Item>
             <Form.Item
               label="Tiểu đoàn"
-              name={"battalion_id"}
-              rules={[{ required: true, message: "Tiểu đoàn là bắt buộc" }]}
+              // name={"battalion_id"}
+              // rules={[{ required: true, message: "Tiểu đoàn là bắt buộc" }]}
             >
               <DebounceSelect
                 value={data?.battalion_id}
@@ -174,3 +174,4 @@ const List = (props: IDetailProps) => {
   );
 };
 export default List;
+

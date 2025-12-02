@@ -175,3 +175,4 @@ const List = (props: IDetailProps) => {
   );
 };
 export default List;
+
