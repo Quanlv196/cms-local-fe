@@ -2,7 +2,7 @@
 const defaultEnv = {
   REACT_APP_BASE_URL:
     process.env.REACT_APP_BASE_URL ||
-    "https://son-saltigrade-jermaine.ngrok-free.dev/",
+    "https://unrepressible-unverminously-shellie.ngrok-free.dev",
   REACT_APP_APP_MODE: process.env.REACT_APP_APP_MODE || "development",
 };
 
