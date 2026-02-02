@@ -13,8 +13,8 @@ RUN yarn build
 # Stage 2: Nginx hosting + runtime env support
 FROM nginx:alpine
 
-# Copy FE build
 COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create folder for runtime env
 RUN mkdir -p /usr/share/nginx/html/config
