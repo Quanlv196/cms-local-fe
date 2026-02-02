@@ -1,24 +1,23 @@
 import { isArray, isEmpty, isNil, startsWith } from "lodash";
 import querystring from "querystring";
-import { baseUrl } from '../constants/environment';
+import { baseUrl } from "../constants/environment";
 import { logoutUser } from "../redux/actions";
 const axios = require("axios");
 
-const Qs = require("qs") ;
+const Qs = require("qs");
 
 let Axios = axios.create({
-  paramsSerializer: (params:any) => Qs.stringify(params, { arrayFormat: "repeat" }),
+  paramsSerializer: (params: any) =>
+    Qs.stringify(params, { arrayFormat: "repeat" }),
   // withCredentials: true,
 });
 
-
 class APIClient {
-
   _getBaseURL: string;
-  _handleTokenExpired: any
-  _token:any;
-  _store:any;
-  _deviceId:any;
+  _handleTokenExpired: any;
+  _token: any;
+  _store: any;
+  _deviceId: any;
 
   constructor() {
     this._getBaseURL = baseUrl;
@@ -29,7 +28,13 @@ class APIClient {
    * @param error
    * @param defaultMessage default message
    */
-   parseErrorMessage = ({ error, defaultMessage }:{error:any, defaultMessage:string}) => {
+  parseErrorMessage = ({
+    error,
+    defaultMessage,
+  }: {
+    error: any;
+    defaultMessage: string;
+  }) => {
     if (
       !isNil(error) &&
       !isNil(error.response) &&
@@ -47,7 +52,13 @@ class APIClient {
    * @param error
    * @param defaultStatusCode
    */
-  parseErrorStatus = ({ error, defaultStatusCode = 404 }:{error:any, defaultStatusCode:number}) => {
+  parseErrorStatus = ({
+    error,
+    defaultStatusCode = 404,
+  }: {
+    error: any;
+    defaultStatusCode: number;
+  }) => {
     if (!isNil(error) && !isNil(error.response)) {
       return error.response.status;
     }
@@ -73,29 +84,22 @@ class APIClient {
   /**
    * initialize
    */
-  initialize = async (callback: ()=> any) => {
+  initialize = async (callback: () => any) => {
     if (callback) {
       callback();
     }
   };
 
-  setTokenExpiredHandler = (handler:any) => {
+  setTokenExpiredHandler = (handler: any) => {
     this._handleTokenExpired = handler;
   };
-  
-  GET = async (path:string, params?:object,header?:object, cancelToken?:any) => {
-    return await this.request(
-      "GET",
-      path,
-      header,
-      null,
-      params,
-      null,
-      cancelToken
-    );
-  };
 
-  DOWNLOAD = async (path:string, params?:object,header?:object, cancelToken?:any) => {
+  GET = async (
+    path: string,
+    params?: object,
+    header?: object,
+    cancelToken?: any,
+  ) => {
     return await this.request(
       "GET",
       path,
@@ -104,11 +108,33 @@ class APIClient {
       params,
       null,
       cancelToken,
-      true
     );
   };
 
-  DOWNLOADPOST = async (path:string, params?:object,header?:object, cancelToken?:any) => {
+  DOWNLOAD = async (
+    path: string,
+    params?: object,
+    header?: object,
+    cancelToken?: any,
+  ) => {
+    return await this.request(
+      "GET",
+      path,
+      header,
+      null,
+      params,
+      null,
+      cancelToken,
+      true,
+    );
+  };
+
+  DOWNLOADPOST = async (
+    path: string,
+    params?: object,
+    header?: object,
+    cancelToken?: any,
+  ) => {
     return await this.request(
       "POST",
       path,
@@ -117,11 +143,16 @@ class APIClient {
       params,
       null,
       cancelToken,
-      true
+      true,
     );
   };
 
-  POST = async (path:string, data?:any, header?:object, cancelToken?:any) => {
+  POST = async (
+    path: string,
+    data?: any,
+    header?: object,
+    cancelToken?: any,
+  ) => {
     return await this.request(
       "POST",
       path,
@@ -129,15 +160,33 @@ class APIClient {
       null,
       null,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  PUT = async (path:string, data?:any, header?:object,cancelToken?:string) => {
-    return await this.request("PUT", path, header, null, null, data, cancelToken);
+  PUT = async (
+    path: string,
+    data?: any,
+    header?: object,
+    cancelToken?: string,
+  ) => {
+    return await this.request(
+      "PUT",
+      path,
+      header,
+      null,
+      null,
+      data,
+      cancelToken,
+    );
   };
 
-  DELETE = async (path:string, data?:any, header?:object, cancelToken?:string) => {
+  DELETE = async (
+    path: string,
+    data?: any,
+    header?: object,
+    cancelToken?: string,
+  ) => {
     return await this.request(
       "DELETE",
       path,
@@ -145,11 +194,16 @@ class APIClient {
       null,
       null,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  paramsPOST = async (path:string, params:object, data:any, cancelToken?:any) => {
+  paramsPOST = async (
+    path: string,
+    params: object,
+    data: any,
+    cancelToken?: any,
+  ) => {
     return await this.request(
       "POST",
       path,
@@ -157,13 +211,18 @@ class APIClient {
       null,
       params,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  jsonParamsPOST = async (path:string, params:object, data:any, cancelToken?:any) => {
+  jsonParamsPOST = async (
+    path: string,
+    params: object,
+    data: any,
+    cancelToken?: any,
+  ) => {
     const headers = {
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json;charset=UTF-8",
     };
     return await this.request(
       "post",
@@ -172,13 +231,13 @@ class APIClient {
       null,
       params,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  jsonPOST = async (path:string, data:any, cancelToken?:any) => {
+  jsonPOST = async (path: string, data: any, cancelToken?: any) => {
     const headers = {
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json;charset=UTF-8",
     };
     return await this.request(
       "post",
@@ -187,13 +246,13 @@ class APIClient {
       null,
       null,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  jsonPUT = async (path:string, data:any, cancelToken?:any) => {
+  jsonPUT = async (path: string, data: any, cancelToken?: any) => {
     const headers = {
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json;charset=UTF-8",
     };
     return await this.request(
       "put",
@@ -202,13 +261,18 @@ class APIClient {
       null,
       null,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  jsonParamsPUT = async (path:string, params:object, data?:any, cancelToken?:any) => {
+  jsonParamsPUT = async (
+    path: string,
+    params: object,
+    data?: any,
+    cancelToken?: any,
+  ) => {
     const headers = {
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json;charset=UTF-8",
     };
     return await this.request(
       "put",
@@ -217,11 +281,11 @@ class APIClient {
       null,
       params,
       data,
-      cancelToken
+      cancelToken,
     );
   };
 
-  authPOST = async (path:string, auth:any, cancelToken?:any) => {
+  authPOST = async (path: string, auth: any, cancelToken?: any) => {
     return await this.request(
       "POST",
       path,
@@ -229,18 +293,25 @@ class APIClient {
       auth,
       null,
       null,
-      cancelToken
+      cancelToken,
     );
   };
 
- 
-
-  request = async (method:string, path:string, headers?:any, auth?:any, params?:any, data?:any, cancelToken?:any, download?:boolean) => {
+  request = async (
+    method: string,
+    path: string,
+    headers?: any,
+    auth?: any,
+    params?: any,
+    data?: any,
+    cancelToken?: any,
+    download?: boolean,
+  ) => {
     try {
       let url;
-      
+
       // params = this.genDataParamsApi(params)
-      
+
       if (startsWith(path, "http")) {
         url = path;
       } else {
@@ -253,10 +324,11 @@ class APIClient {
       if (isNil(headers)) {
         headers = {};
       }
-      
+
       headers["Accept"] = "application/json, text/plain, */*";
+      headers["ngrok-skip-browser-warning"] = "true";
       if (!isEmpty(this._token) && isNil(headers["Authorization"])) {
-        headers["Authorization"] = 'Bearer '+this._token;
+        headers["Authorization"] = "Bearer " + this._token;
         // headers["X-Openerp-Session-Id"] = this._token;
       }
       // console.log('type',data instanceof FormData);
@@ -265,7 +337,6 @@ class APIClient {
       } else if (!isNil(data)) {
         if (data instanceof FormData) {
           headers["Content-Type"] = "multipart/form-data";
-          
         } else {
           // data = this.genDataParamsApi(data)
           const contentType = headers["Content-Type"];
@@ -275,11 +346,11 @@ class APIClient {
           ) {
             // post using x-www-form-urlencoded
             data = querystring.stringify(data);
-          }else if(
+          } else if (
             contentType === "text/plain" ||
             contentType === "text/plain;charset=UTF-8"
-          ){
-            download = true
+          ) {
+            download = true;
             data = JSON.stringify(data);
           } else {
             // post using json
@@ -296,7 +367,7 @@ class APIClient {
       // console.log("params: " + JSON.stringify(params));
       // console.log("data: " + data);
       // console.log("cancel token: " + (cancelToken ? "not null" : "null"));
-      console.log("axios: ",{
+      console.log("axios: ", {
         url,
         method,
         headers,
@@ -304,9 +375,9 @@ class APIClient {
         params,
         data,
         cancelToken,
-        responseType: download?'blob':'',
+        responseType: download ? "blob" : "",
       });
-      
+
       let rawResponse = await Axios({
         url,
         method,
@@ -315,57 +386,70 @@ class APIClient {
         params,
         data,
         cancelToken,
-        responseType: download?'blob':'',
+        responseType: download ? "blob" : "",
       });
-      
+
       // console.log("request url: ", rawResponse);
       const response = rawResponse.data;
       // console.log("request url: ", rawResponse);
-      if(response?.error){
-        console.log(`checkaaaaaaaaaaaaaaa`,response.error?.response)
+      if (response?.error) {
+        console.log(`checkaaaaaaaaaaaaaaa`, response.error?.response);
         return {
           error: {
-            error_description: response?.error?.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại !",
-            status : 400
-          }
+            error_description:
+              response?.error?.data?.message ||
+              "Đã có lỗi xảy ra, vui lòng thử lại !",
+            status: 400,
+          },
         };
       }
       return {
-        response
+        response,
       };
-    } catch (error:any) {
-      
-      if(error?.response?.data?.statusCode === 401 && !["/account/logout", "/account/disable"].includes(window.location?.pathname )){
-         window.location.href = "/account/logout"
-         return {
+    } catch (error: any) {
+      if (
+        error?.response?.data?.statusCode === 401 &&
+        !["/account/logout", "/account/disable"].includes(
+          window.location?.pathname,
+        )
+      ) {
+        window.location.href = "/account/logout";
+        return {
           error: {
             error_description: "Phiên đăng nhập hết hạn",
-            status :error.response.statuss
-          }
-        }
+            status: error.response.statuss,
+          },
+        };
       }
 
       // console.log("API error: ", error.response, error.request, error.general);
       if (error.response) {
         // Request made and server responded
-        console.log("API error: ", error.response.data, isArray(error.response.data?.message));
+        console.log(
+          "API error: ",
+          error.response.data,
+          isArray(error.response.data?.message),
+        );
         // console.log(error.response.status);
         // console.log(error.response.headers);
         return {
           error: {
-            error_description: isArray(error.response.data?.message) ? error.response.data?.message?.join(',') : error.response.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại !",
-            status :error.response.status
-          }
-        }
+            error_description: isArray(error.response.data?.message)
+              ? error.response.data?.message?.join(",")
+              : error.response.data?.message ||
+                "Đã có lỗi xảy ra, vui lòng thử lại !",
+            status: error.response.status,
+          },
+        };
       }
       //  else if (error.request) {
       //   // The request was made but no response was received
       //   // console.log('error.request',error.request);
-      //   // 
+      //   //
       //   setTimeout(() =>{
       //     // window.location.href = '/account/login';
       //     console.log("logoutAPI", error);
-          
+
       //     this._store.dispatch(logoutUser({}))
       //   },600)
       //   return {
@@ -374,40 +458,40 @@ class APIClient {
       //       status :500
       //     }
       //   }
-      // } 
+      // }
       else {
         // Something happened in setting up the request that triggered an Error
         // console.log('Error', error.message);
         return {
-          error:{
-            error_description:"Đã có lỗi xảy ra, vui lòng thử lại !",
-            status :500
-          }
-        }
+          error: {
+            error_description: "Đã có lỗi xảy ra, vui lòng thử lại !",
+            status: 500,
+          },
+        };
       }
     }
   };
 
-  genDataParamsApi = (data:any)=>{
-    const newData:any = {}
-    data&&Object.keys(data).map(function(item,i) {
-        if(!isNil(data[item]) && data[item] !== ""){
-            newData[item] = data[item]
+  genDataParamsApi = (data: any) => {
+    const newData: any = {};
+    data &&
+      Object.keys(data).map(function (item, i) {
+        if (!isNil(data[item]) && data[item] !== "") {
+          newData[item] = data[item];
         }
-    });
-    return newData
-  }
+      });
+    return newData;
+  };
 
   getToken = () => this._token;
 
-  setToken = (token:any) => (this._token = token);
+  setToken = (token: any) => (this._token = token);
 
   /**
    * update redux store
    * @param store
    */
-  updateStore = (store:any) => {
-    
+  updateStore = (store: any) => {
     if (!store || this._store === store) {
       return;
     }
